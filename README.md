@@ -47,3 +47,5 @@ Functions:
     - Execute provided `$query` and output results.
     - Common usage would be raw queries where Koss does not have functionality to help.
     - *Note: Cannot be mixed with other functions*
+
+[Look at our examples here.](https://github.com/Aberdeener/Koss/blob/main/index.php)

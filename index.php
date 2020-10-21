@@ -1,13 +1,16 @@
 <?php
 
-// Demo page for my own testing as well as documentation examples
+/**
+ * 
+ * Demo page for my own testing as well as documentation examples  
+ */ 
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require 'Koss.php';
-require 'config.php';
+require 'config.php'; /* Using config.php so I don't leak my password */
 
 $koss = new Koss('localhost', 3306, 'koss', 'tadhg', $password);
 
