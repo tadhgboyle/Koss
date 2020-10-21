@@ -9,25 +9,28 @@
  */
 class Koss {
 
-    protected mysqli $_mysqli;
+    protected PDO $_pdo;
 
-    protected string $_query;
+    protected PDOStatement $_query;
 
     protected array $_where = array();
 
     protected 
         $_query_select = '',
         $_query_from = '',
-        $_query_where = '',
         $_query_group_by = '',
         $_query_order_by = '',
-        $_query_limit = '';
+        $_query_limit = '',
+        $_query_built = '';
 
-    protected KossResultSet $_result;
-
-    public function __construct(mysqli $mysqli)
+    public function __construct(string $host, string $port, string $database, string $username, string $password)
     {
-        $this->_mysqli = $mysqli;
+        try {
+            $this->_pdo = new PDO('mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database, $username, $password);
+            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
     }
 
     /**
@@ -35,7 +38,7 @@ class Koss {
      */
     public function rawQuery(string $query): KossResultSet
     {
-        $this->_query = $query;
+        $this->_query_built = $query;
         return $this->execute();
     }
 
@@ -53,7 +56,7 @@ class Koss {
     public function getSome(string $table, string ...$columns): Koss
     {
         $columns = implode(', ', $columns);
-        $this->_query_select = "SELECT `$columns` FROM `$table`";
+        $this->_query_select = "SELECT $columns FROM `$table`";
         return $this;
     }
 
@@ -135,7 +138,7 @@ class Koss {
      */
     public function first()
     {
-        return $this->_result->toArray()[0];
+        return $this->_result[0];
     }
 
     /**
@@ -145,11 +148,10 @@ class Koss {
     {
         $this->_query_select = '';
         $this->_query_from = '';
-        $this->_query_where = '';
         $this->_query_group_by = '';
         $this->_query_order_by = '';
         $this->_query_limit = '';
-        $this->_query = '';
+        $this->_query_built = '';
     }
 
     /**
@@ -157,38 +159,28 @@ class Koss {
      */
     private function build(): string
     {
-        $this->_query = $this->_query_select . ' ' . $this->_query_from . ' ' . $this->assembleWhereClause() . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
-        return $this->_query;
+        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . $this->assembleWhereClause() . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+        return $this->_query_built;
     }
 
     /**
-     * Execute this query and store result in a KossResultSet
+     * Execute this query and store result
      */
-    public function execute(): KossResultSet
+    public function execute()
     {
-        $this->_result = new KossResultSet($this->_mysqli->query($this->build()));
-        $this->reset();
-        return $this->_result;
+        if ($this->_query = $this->_pdo->prepare($this->build())) {
+            if ($this->_query->execute()) {
+                try {
+                    $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+                    $this->reset();
+                    return $this->_result;
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            } else {
+                die(print_r($this->_pdo->errorInfo()));
+            }
+        }
+        return null;
     }
-}
-
-class KossResultSet {
-
-    protected mysqli_result $_mysqli_result;
-
-    public function __construct(mysqli_result $mysqli_result)
-    {
-        $this->_mysqli_result = $mysqli_result;
-    }
-    
-    public function rawResult(): mysqli_result
-    {
-        return $this->_mysqli_result;
-    }
-
-    public function toArray(): array
-    {
-        return $this->_mysqli_result->fetch_all();
-    }
-
 }
