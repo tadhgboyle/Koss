@@ -34,15 +34,6 @@ class Koss {
     }
 
     /**
-     * Execute a raw MySQL query and store it in a KossResultSet
-     */
-    public function rawQuery(string $query): KossResultSet
-    {
-        $this->_query_built = $query;
-        return $this->execute();
-    }
-
-    /**
      * Get all columns in $table
      */
     public function getAll(string $table): Koss 
@@ -120,6 +111,8 @@ class Koss {
     {
         if ((is_callable($expression) && $expression()) || $expression) {
             $callback();
+        } else if ((is_callable($expression) && !$expression()) || !$expression) {
+            $fallback();
         }
 
         return $this;
@@ -134,24 +127,11 @@ class Koss {
     }
 
     /**
-     * Select only the first row in the results
-     */
-    public function first()
-    {
-        return $this->_result[0];
-    }
-
-    /**
      * Reset current working query to be prepared for next query
      */
     private function reset() 
     {
-        $this->_query_select = '';
-        $this->_query_from = '';
-        $this->_query_group_by = '';
-        $this->_query_order_by = '';
-        $this->_query_limit = '';
-        $this->_query_built = '';
+        $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
     /**
@@ -166,9 +146,9 @@ class Koss {
     /**
      * Execute this query and store result
      */
-    public function execute()
+    public function execute(string $query = null): array
     {
-        if ($this->_query = $this->_pdo->prepare($this->build())) {
+        if ($this->_query = $this->_pdo->prepare($query ?? $this->build())) {
             if ($this->_query->execute()) {
                 try {
                     $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
