@@ -26,6 +26,8 @@ foreach ($results as $result) {
     echo print_r($result) . '<br>';
 }
 
+echo '<br>';
+
 $results = $koss
                ->getSome('users', 'username')
                ->when(
@@ -33,12 +35,14 @@ $results = $koss
                         return true;
                     },
                     function() use ($koss) {
-                        return $koss->orderBy('id');
+                        return $koss->orderBy('id', 'ASC');
                     }
                )->execute();
 foreach ($results as $result) {
     echo print_r($result) . '<br>';
 }
+
+echo '<br>';
 
 $results = $koss->execute("SELECT * FROM users");
 foreach ($results as $result) {

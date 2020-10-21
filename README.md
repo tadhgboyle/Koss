@@ -29,9 +29,11 @@ Functions:
     - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are similar to to `%$like%`
     - *Note: Multiple `like` and `where` clauses can be passed and Koss will handle compiling the correct MySQL code*
     - Example SQL code: `WHERE first_name LIKE %Tadhg%`
+  - `groupBy(string $column)`
+    - Group together rows with same `$column` values
+    - Example SQL code: `GROUP BY age`
   - `orderBy(string $column, string $order)`
     - Sort output by `$column` either `ASC` or `DESC`
-    - *Note: if `$order` is not provided, `DESC` is assumed*
     - Example SQL code: `ORDER BY first_name DESC`
   - `limit(int $limit)`
     - Only return `$limit` rows.

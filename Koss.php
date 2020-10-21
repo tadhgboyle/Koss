@@ -72,23 +72,13 @@ class Koss {
         return $this->where($column, 'LIKE', "%$like%");
     }
 
-    private function assembleWhereClause(): string 
+    public function groupBy(string $column): Koss
     {
-        $first = true;
-        $return = '';
-        foreach ($this->_where as $clause) {
-            if ($first) {
-                $return .= 'WHERE ';
-                $first = false;
-            }
-            else $return .= 'AND ';
-
-            $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
-        }
-        return $return;
+        $this->_query_group_by = "GROUP BY `$column`";
+        return $this;
     }
 
-    public function orderBy(string $column, string $order = 'DESC'): Koss
+    public function orderBy(string $column, string $order): Koss
     {
         $this->_query_order_by = "ORDER BY `$column` $order";
         return $this;
@@ -119,18 +109,11 @@ class Koss {
     }
 
     /**
-     * Debugging only: Output the built string of all queries so far
-     */
-    public function __toString(): string
-    {
-        return $this->build();
-    }
-
-    /**
      * Reset current working query to be prepared for next query
      */
     private function reset() 
     {
+        $this->_where = array();
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
@@ -141,6 +124,24 @@ class Koss {
     {
         $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . $this->assembleWhereClause() . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
         return $this->_query_built;
+    }
+
+    /**
+     * Assemble all where clauses into one string using appropriate MySQL syntax
+     */
+    private function assembleWhereClause(): string
+    {
+        $first = true;
+        $return = '';
+        foreach ($this->_where as $clause) {
+            if ($first) {
+                $return .= 'WHERE ';
+                $first = false;
+            } else $return .= 'AND ';
+
+            $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
+        }
+        return $return;
     }
 
     /**
@@ -162,5 +163,13 @@ class Koss {
             }
         }
         return null;
+    }
+
+    /**
+     * Debugging only: Output the built string of all queries so far
+     */
+    public function __toString(): string
+    {
+        return $this->build();
     }
 }
