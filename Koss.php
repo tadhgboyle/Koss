@@ -173,3 +173,50 @@ class Koss {
         return $this->build();
     }
 }
+
+interface KossQuery {
+
+    /**
+     * Create new instance of a KossQuery by injecting the beginning statement
+     */
+    public function __construct(string $query);
+
+    /**
+     * Assemble queries into MySQL statement
+     */
+    public function build(): string;
+
+    /**
+     * Execute repsective query and store result
+     */
+    public function execute(string $query = null);
+
+    /**
+     * Debugging only: Output the built string of all queries so far
+     */
+    public function __toString(): string;
+
+}
+
+class KossSelectQuery implements KossQuery {
+
+    public function __construct(string $query) 
+    {
+        return $this;
+    }
+
+    public function __toString(): string 
+    {
+
+    }
+
+}
+
+class KossUpdateQuery implements KossQuery {
+
+    public function __toString(): string
+    {
+
+    }
+
+}
