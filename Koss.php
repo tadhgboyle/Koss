@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * 
@@ -7,7 +7,8 @@
  * @author Tadhg Boyle
  * @since October 2020
  */
-class Koss {
+class Koss
+{
 
     protected PDO $_pdo;
 
@@ -15,7 +16,7 @@ class Koss {
 
     protected array $_where = array();
 
-    protected 
+    protected
         $_query_select = '',
         $_query_from = '',
         $_query_group_by = '',
@@ -36,7 +37,7 @@ class Koss {
     /**
      * Get all columns in $table
      */
-    public function getAll(string $table): Koss 
+    public function getAll(string $table): Koss
     {
         return $this->getSome($table, '*');
     }
@@ -111,7 +112,7 @@ class Koss {
     /**
      * Reset current working query to be prepared for next query
      */
-    private function reset() 
+    private function reset()
     {
         $this->_where = array();
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
@@ -149,6 +150,69 @@ class Koss {
      */
     public function execute(string $query = null): array
     {
+    }
+
+    /**
+     * Debugging only: Output the built string of all queries so far
+     */
+    public function __toString(): string
+    {
+        return $this->build();
+    }
+}
+
+interface IKossQuery
+{
+
+    /**
+     * Create new instance of a KossQuery by injecting the beginning statement
+     */
+    public function __construct(PDO $pdo, string $query);
+
+    /**
+     * Assemble queries into MySQL statement
+     */
+    public function build(): string;
+
+    /**
+     * Execute repsective query and store result
+     */
+    public function execute(string $query = null);
+
+    /**
+     * Reset query strings
+     */
+    public function reset(): void;
+
+    /**
+     * Debugging only: Output the built string of all queries so far
+     */
+    public function __toString(): string;
+}
+
+class KossSelectQuery implements IKossQuery
+{
+
+    protected PDO $_pdo;
+
+    protected PDOStatement $_query;
+
+    protected string
+        $_query_select;
+
+    public function __construct(PDO $pdo, string $query_select)
+    {
+        $this->_pdo = $pdo;
+        $this->_query_select = $query_select;
+    }
+
+    public function build(): string
+    {
+        return $this->_query_select;
+    }
+
+    public function execute(string $query = null): array
+    {
         if ($this->_query = $this->_pdo->prepare($query ?? $this->build())) {
             if ($this->_query->execute()) {
                 try {
@@ -165,58 +229,41 @@ class Koss {
         return null;
     }
 
-    /**
-     * Debugging only: Output the built string of all queries so far
-     */
+    public function reset(): void
+    {
+        //
+    }
+
     public function __toString(): string
     {
         return $this->build();
     }
 }
 
-interface KossQuery {
+class KossUpdateQuery implements IKossQuery
+{
 
-    /**
-     * Create new instance of a KossQuery by injecting the beginning statement
-     */
-    public function __construct(string $query);
-
-    /**
-     * Assemble queries into MySQL statement
-     */
-    public function build(): string;
-
-    /**
-     * Execute repsective query and store result
-     */
-    public function execute(string $query = null);
-
-    /**
-     * Debugging only: Output the built string of all queries so far
-     */
-    public function __toString(): string;
-
-}
-
-class KossSelectQuery implements KossQuery {
-
-    public function __construct(string $query) 
+    public function __construct(PDO $pdo, string $query)
     {
         return $this;
     }
 
-    public function __toString(): string 
+    public function build(): string
     {
-
+        return $this->_query;
     }
 
-}
+    public function execute(string $query = null)
+    {
+    }
 
-class KossUpdateQuery implements KossQuery {
+    public function reset(): void
+    {
+        //
+    }
 
     public function __toString(): string
     {
-
+        return $this->build();
     }
-
 }
