@@ -17,10 +17,8 @@ $koss = new Koss('localhost', 3306, 'koss', 'tadhg', $password);
 $results = $koss
             ->getAll('users')
             ->orderBy('first_name', 'ASC')
-            ->when(5 < 10, 
-                function() use ($koss) {
-                    return $koss->limit(5);
-                })
+            ->where('first_name', '!=', 'Tadhg')
+            ->limit(5)
             ->execute();
 foreach ($results as $result) {
     echo print_r($result) . '<br>';
@@ -31,20 +29,18 @@ echo '<br>';
 $results = $koss
                ->getSome('users', 'username')
                ->when(
-                    function() {
-                        return true;
-                    },
-                    function() use ($koss) {
-                        return $koss->orderBy('id', 'ASC');
-                    }
-               )->execute();
+                    fn() => true,
+                    fn() => $koss->orderBy('id', 'ASC')
+               )
+               ->limit(5)
+               ->execute();
 foreach ($results as $result) {
     echo print_r($result) . '<br>';
 }
 
 echo '<br>';
 
-$results = $koss->execute("SELECT * FROM users");
+$results = $koss->execute("SELECT * FROM users WHERE users.id <= 4");
 foreach ($results as $result) {
         echo print_r($result) . '<br>';
 }

@@ -16,13 +16,7 @@ class Koss
 
     protected array $_where = array();
 
-    protected
-        $_query_select = '',
-        $_query_from = '',
-        $_query_group_by = '',
-        $_query_order_by = '',
-        $_query_limit = '',
-        $_query_built = '';
+    protected $_query_instance;
 
     public function __construct(string $host, string $port, string $database, string $username, string $password)
     {
@@ -36,59 +30,54 @@ class Koss
 
     /**
      * Get all columns in $table
+     * Initiates a KossSelectQuery instance
      */
-    public function getAll(string $table): Koss
+    public function getAll(string $table): KossSelectQuery
     {
         return $this->getSome($table, '*');
     }
 
     /**
      * Get specified $columns in a $table
+     * Initiates a KossSelectQuery instance
      */
-    public function getSome(string $table, string ...$columns): Koss
+    public function getSome(string $table, string ...$columns): KossSelectQuery
     {
         $columns = implode(', ', $columns);
-        $this->_query_select = "SELECT $columns FROM `$table`";
-        return $this;
+        $this->_query_instance = new KossSelectQuery($this->_pdo, "SELECT $columns FROM `$table`");
+        return $this->_query_instance;
     }
 
-    public function where(string $column, string $operator, string $matches = null): Koss
+    /**
+     * Insert a new row into $table
+     * Initiates a KossUpdateQuery instance
+     */
+    public function insert(string $table, array $row): KossUpdateQuery
     {
-        if ($matches == null) {
-            $matches = $operator;
-            $operator = '=';
+        $this->_query_instance = new KossUpdateQuery($this->_pdo, "INSERT INTO `$table`");
+        return $this->_query_instance;
+    }
+
+    /**
+     * Allow running raw queries. Auto detects which sub class to initialize and execute
+     */
+    public function execute(string $query): array
+    {
+        $token = explode(' ', $query)[0];
+        switch($token) {
+            case "SELECT":
+                $kossSelectQuery = new KossSelectQuery($this->_pdo, $query);
+                return $kossSelectQuery->execute();
+                break;
+            case "INSERT":
+            case "UPDATE": 
+                $kossUpdateQuery = new KossUpdateQuery($this->_pdo, $query);
+                return $kossUpdateQuery->execute();
+                break;
+            default: 
+                throw new PDOException("Invalid start of MySQL query string. Token: $token");
+                break;
         }
-
-        $this->_where[] = [
-            'column' => $column,
-            'operator' => $operator,
-            'matches' => $matches
-        ];
-
-        return $this;
-    }
-
-    public function like(string $column, string $like): Koss
-    {
-        return $this->where($column, 'LIKE', "%$like%");
-    }
-
-    public function groupBy(string $column): Koss
-    {
-        $this->_query_group_by = "GROUP BY `$column`";
-        return $this;
-    }
-
-    public function orderBy(string $column, string $order): Koss
-    {
-        $this->_query_order_by = "ORDER BY `$column` $order";
-        return $this;
-    }
-
-    public function limit(int $limit): Koss
-    {
-        $this->_query_limit = "LIMIT $limit";
-        return $this;
     }
 
     /**
@@ -98,43 +87,47 @@ class Koss
      * @param mixed $callback - Ran if $expression is true
      * @param mixed $fallback (optional) - Ran if $expression is false
      */
-    public function when($expression, $callback, $fallback = null): Koss
+    public static function when($expression, $callback, $fallback = null): void
     {
         if ((is_callable($expression) && $expression()) || $expression) {
             $callback();
-        } else if ((is_callable($expression) && !$expression()) || !$expression) {
+        } else if (((is_callable($expression) && !$expression()) || !$expression) && $fallback != null) {
             $fallback();
         }
-
-        return $this;
     }
 
     /**
-     * Reset current working query to be prepared for next query
+     * Janky workaround for when()
      */
-    private function reset()
+    public function limit(int $rows): void
     {
-        $this->_where = array();
-        $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
+        $this->_query_instance->limit($rows);
     }
 
     /**
-     * Assemble all non-empty clauses into one
+     * Janky workaround for when()
      */
-    private function build(): string
+    public function orderBy(string $column, string $sort): void
     {
-        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . $this->assembleWhereClause() . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
-        return $this->_query_built;
+        $this->_query_instance->orderBy($column, $sort);
+    }
+
+    /**
+     * Janky workaround for when()
+     */
+    public function where(string $table, string $operator, string $matches = null): void
+    {
+        $this->_query_instance->where($table, $operator, $matches);
     }
 
     /**
      * Assemble all where clauses into one string using appropriate MySQL syntax
      */
-    private function assembleWhereClause(): string
+    public static function assembleWhereClause(array $where): string
     {
         $first = true;
         $return = '';
-        foreach ($this->_where as $clause) {
+        foreach ($where as $clause) {
             if ($first) {
                 $return .= 'WHERE ';
                 $first = false;
@@ -143,21 +136,6 @@ class Koss
             $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
         }
         return $return;
-    }
-
-    /**
-     * Execute this query and store result
-     */
-    public function execute(string $query = null): array
-    {
-    }
-
-    /**
-     * Debugging only: Output the built string of all queries so far
-     */
-    public function __toString(): string
-    {
-        return $this->build();
     }
 }
 
@@ -168,6 +146,11 @@ interface IKossQuery
      * Create new instance of a KossQuery by injecting the beginning statement
      */
     public function __construct(PDO $pdo, string $query);
+
+    /**
+     * Execute Koss function under certain conditions
+     */
+    public function when($expression, callable $callback, callable $fallback = null): IKossQuery;
 
     /**
      * Assemble queries into MySQL statement
@@ -198,7 +181,14 @@ class KossSelectQuery implements IKossQuery
     protected PDOStatement $_query;
 
     protected string
-        $_query_select;
+        $_query_select = '',
+        $_query_from = '',
+        $_query_group_by = '',
+        $_query_order_by = '',
+        $_query_limit = '',
+        $_query_built = '';
+    
+    protected array $_where = array();
 
     public function __construct(PDO $pdo, string $query_select)
     {
@@ -206,9 +196,55 @@ class KossSelectQuery implements IKossQuery
         $this->_query_select = $query_select;
     }
 
+    public function where(string $column, string $operator, string $matches = null): KossSelectQuery
+    {
+        if ($matches == null) {
+            $matches = $operator;
+            $operator = '=';
+        }
+
+        $this->_where[] = [
+            'column' => $column,
+            'operator' => $operator,
+            'matches' => $matches
+        ];
+
+        return $this;
+    }
+
+    public function like(string $column, string $like): KossSelectQuery
+    {
+        return $this->where($column, 'LIKE', "%$like%");
+    }
+
+    public function groupBy(string $column): KossSelectQuery
+    {
+        $this->_query_group_by = "GROUP BY `$column`";
+        return $this;
+    }
+
+    public function orderBy(string $column, string $order): KossSelectQuery
+    {
+        $this->_query_order_by = "ORDER BY `$column` $order";
+        return $this;
+    }
+
+    public function limit(int $limit): KossSelectQuery
+    {
+        $this->_query_limit = "LIMIT $limit";
+        return $this;
+    }
+
+    public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery 
+    {
+        Koss::when($expression, $callback, $fallback);
+        return $this;
+    }
+
     public function build(): string
     {
-        return $this->_query_select;
+        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Koss::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+        return $this->_query_built;
     }
 
     public function execute(string $query = null): array
@@ -231,7 +267,8 @@ class KossSelectQuery implements IKossQuery
 
     public function reset(): void
     {
-        //
+        $this->_where = array();
+        $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
     public function __toString(): string
@@ -248,6 +285,12 @@ class KossUpdateQuery implements IKossQuery
         return $this;
     }
 
+    public function when($expression, callable $callback, callable $fallback = null): KossUpdateQuery
+    {
+        Koss::when($expression, $callback, $fallback);
+        return $this;
+    }
+
     public function build(): string
     {
         return $this->_query;
@@ -259,7 +302,6 @@ class KossUpdateQuery implements IKossQuery
 
     public function reset(): void
     {
-        //
     }
 
     public function __toString(): string
