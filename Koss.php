@@ -58,13 +58,16 @@ class Koss {
             $operator = '=';
         }
 
-        $this->_where[] = [
-            'column' => $column,
-            'operator' => $operator,
-            'matches' => $matches
-        ];
-
-        return $this;
+        if (in_array($operator, array('LIKE', '=', '<>', '>=', '<='))) {
+            $this->_where[] = [
+                'column' => $column,
+                'operator' => $operator,
+                'matches' => $matches
+            ];
+            return $this;
+        } else {
+            die(new PDOException('Invalid operator: ' . $operator));
+        }
     }
 
     public function like(string $column, string $like): Koss
@@ -101,7 +104,7 @@ class Koss {
     {
         if ((is_callable($expression) && $expression()) || $expression) {
             $callback();
-        } else if ((is_callable($expression) && !$expression()) || !$expression) {
+        } else if (((is_callable($expression) && !$expression()) || !$expression) && $fallback != null) {
             $fallback();
         }
 

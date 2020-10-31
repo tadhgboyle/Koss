@@ -4,6 +4,7 @@
  * 
  * Demo page for my own testing as well as documentation examples  
  */ 
+$start = time() * 1000;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -14,37 +15,11 @@ require 'config.php'; /* Using config.php so I don't leak my password */
 
 $koss = new Koss('localhost', 3306, 'koss', 'tadhg', $password);
 
-$results = $koss
-            ->getAll('users')
-            ->orderBy('first_name', 'ASC')
-            ->when(5 < 10, 
-                function() use ($koss) {
-                    return $koss->limit(5);
-                })
-            ->execute();
-foreach ($results as $result) {
-    echo print_r($result) . '<br>';
-}
+$results = $koss->getAll('users')->execute();
+echo print_r($results);
+
+$results = $koss->getAll('users')->when(isset($_COOKIE['limit']), fn() => $koss->limit(5))->execute();
+echo print_r($results);
 
 echo '<br>';
-
-$results = $koss
-               ->getSome('users', 'username')
-               ->when(
-                    function() {
-                        return true;
-                    },
-                    function() use ($koss) {
-                        return $koss->orderBy('id', 'ASC');
-                    }
-               )->execute();
-foreach ($results as $result) {
-    echo print_r($result) . '<br>';
-}
-
-echo '<br>';
-
-$results = $koss->execute("SELECT * FROM users");
-foreach ($results as $result) {
-        echo print_r($result) . '<br>';
-}
+die('page load: ' . ((time() * 1000) - $start));
