@@ -29,7 +29,7 @@ echo '<br>';
 $results = $koss
                ->getSome('users', 'username')
                ->when(
-                    fn() => true,
+                    true,
                     fn() => $koss->orderBy('id', 'ASC')
                )
                ->limit(5)
@@ -40,7 +40,10 @@ foreach ($results as $result) {
 
 echo '<br>';
 
-$results = $koss->execute("SELECT * FROM users WHERE users.id <= 4");
+$results = $koss->execute("SELECT * FROM users WHERE users.id <= 5");
 foreach ($results as $result) {
         echo print_r($result) . '<br>';
 }
+
+$result = $koss->insert('users', array('username' => 'aberdeener', 'first_name' => 'tadhg', 'last_name' => 'boyle'))->onDuplicateKey(array('username' => 'Aber'))->execute();
+echo $result;

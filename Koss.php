@@ -54,7 +54,20 @@ class Koss
      */
     public function insert(string $table, array $row): KossUpdateQuery
     {
-        $this->_query_instance = new KossUpdateQuery($this->_pdo, "INSERT INTO `$table`");
+        $this->_query_instance = KossUpdateQuery::insert($this->_pdo, $table, $row);
+        return $this->_query_instance;
+
+    }
+
+    /**
+     * Update an existing row
+     * Initiates a KossUpdateQuery instance
+     */
+    public function update(string $table, array $values, array $where): KossUpdateQuery
+    {
+        $where = Koss::assembleWhereClause($where);
+        $values = Koss::assembleWhereClause($values);
+        $this->_query_instance = new KossUpdateQuery($this->_pdo, "UPDATE $table SET $values WHERE $where");
         return $this->_query_instance;
     }
 
@@ -64,17 +77,17 @@ class Koss
     public function execute(string $query): array
     {
         $token = explode(' ', $query)[0];
-        switch($token) {
+        switch ($token) {
             case "SELECT":
                 $kossSelectQuery = new KossSelectQuery($this->_pdo, $query);
                 return $kossSelectQuery->execute();
                 break;
             case "INSERT":
-            case "UPDATE": 
+            case "UPDATE":
                 $kossUpdateQuery = new KossUpdateQuery($this->_pdo, $query);
                 return $kossUpdateQuery->execute();
                 break;
-            default: 
+            default:
                 throw new PDOException("Invalid start of MySQL query string. Token: $token");
                 break;
         }
@@ -121,6 +134,22 @@ class Koss
     }
 
     /**
+     * Janky workaround for when()
+     */
+    public function groupBy(string $column): void
+    {
+        $this->_query_instance->groupBy($column);
+    }
+
+    /**
+     * Janky workaround for when()
+     */
+    public function like(string $column, string $like): void
+    {
+        $this->_query_instance->like($column, $like);
+    }
+
+    /**
      * Assemble all where clauses into one string using appropriate MySQL syntax
      */
     public static function assembleWhereClause(array $where): string
@@ -160,7 +189,7 @@ interface IKossQuery
     /**
      * Execute repsective query and store result
      */
-    public function execute(string $query = null);
+    public function execute();
 
     /**
      * Reset query strings
@@ -187,7 +216,7 @@ class KossSelectQuery implements IKossQuery
         $_query_order_by = '',
         $_query_limit = '',
         $_query_built = '';
-    
+
     protected array $_where = array();
 
     public function __construct(PDO $pdo, string $query_select)
@@ -235,7 +264,7 @@ class KossSelectQuery implements IKossQuery
         return $this;
     }
 
-    public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery 
+    public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery
     {
         Koss::when($expression, $callback, $fallback);
         return $this;
@@ -247,9 +276,9 @@ class KossSelectQuery implements IKossQuery
         return $this->_query_built;
     }
 
-    public function execute(string $query = null): array
+    public function execute(): array
     {
-        if ($this->_query = $this->_pdo->prepare($query ?? $this->build())) {
+        if ($this->_query = $this->_pdo->prepare($this->build())) {
             if ($this->_query->execute()) {
                 try {
                     $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
@@ -258,9 +287,7 @@ class KossSelectQuery implements IKossQuery
                 } catch (PDOException $e) {
                     die($e->getMessage());
                 }
-            } else {
-                die(print_r($this->_pdo->errorInfo()));
-            }
+            } else die(print_r($this->_pdo->errorInfo()));
         }
         return null;
     }
@@ -279,9 +306,43 @@ class KossSelectQuery implements IKossQuery
 
 class KossUpdateQuery implements IKossQuery
 {
+    protected PDO $_pdo;
+
+    protected PDOStatement $_query;
+
+    protected string
+        $_query_insert = '',
+        $_query_duplicate_key = '',
+        $_query_built = '';
+
+    protected array $_where = array();
 
     public function __construct(PDO $pdo, string $query)
     {
+        $this->_pdo = $pdo;
+        $this->_query_insert = $query;
+    }
+
+    public static function insert(PDO $pdo, string $table, array $row): KossUpdateQuery
+    {
+        $quotify = function ($string) {
+            return '\'' . $string . '\'';
+        };
+        $backtickify = function ($string) {
+            return '`' . $string . '`';
+        };
+        $columns = implode(', ', array_map($backtickify, array_keys($row)));
+        $values = implode(', ', array_map($quotify, array_values($row)));
+        return new self($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
+    }
+
+    public function onDuplicateKey(array $values): KossUpdateQuery
+    {
+        $compiled_values = '';
+        foreach ($values as $column => $value) {
+            $compiled_values .= "`$column` = '$value' ";
+        }
+        $this->_query_duplicate_key = "ON DUPLICATE KEY UPDATE $compiled_values";
         return $this;
     }
 
@@ -293,15 +354,30 @@ class KossUpdateQuery implements IKossQuery
 
     public function build(): string
     {
-        return $this->_query;
+        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Koss::assembleWhereClause($this->_where);
+        return $this->_query_built;
     }
 
-    public function execute(string $query = null)
+    public function execute()
     {
+        if ($this->_query = $this->_pdo->prepare($this->build())) {
+            if ($this->_query->execute()) {
+                try {
+                    $this->_result = $this->_query->rowCount();
+                    $this->reset();
+                    return $this->_result;
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            } else die(print_r($this->_pdo->errorInfo()));
+        }
+        return null;
     }
 
     public function reset(): void
     {
+        $this->_where = array();
+        $this->_query_insert = $this->_query_duplicate_key = '';
     }
 
     public function __toString(): string
