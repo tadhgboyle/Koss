@@ -43,8 +43,7 @@ class Koss
      */
     public function getSome(string $table, string ...$columns): KossSelectQuery
     {
-        $columns = implode(', ', $columns);
-        $this->_query_instance = new KossSelectQuery($this->_pdo, "SELECT $columns FROM `$table`");
+        $this->_query_instance = KossSelectQuery::get($this->_pdo, $table, $columns);
         return $this->_query_instance;
     }
 
@@ -65,14 +64,12 @@ class Koss
      */
     public function update(string $table, array $values, array $where): KossUpdateQuery
     {
-        $where = Koss::assembleWhereClause($where);
-        $values = Koss::assembleWhereClause($values);
-        $this->_query_instance = new KossUpdateQuery($this->_pdo, "UPDATE $table SET $values WHERE $where");
+        $this->_query_instance = KossUpdateQuery::update($this->_pdo, $table, $values, $where);
         return $this->_query_instance;
     }
 
     /**
-     * Allow running raw queries. Auto detects which sub class to initialize and execute
+     * Allow running raw queries. Detects which sub class to initialize and execute
      */
     public function execute(string $query): array
     {
@@ -88,7 +85,7 @@ class Koss
                 return $kossUpdateQuery->execute();
                 break;
             default:
-                throw new PDOException("Invalid start of MySQL query string. Token: $token");
+                throw new PDOException("Invalid start of MySQL query string. Token: $token.");
                 break;
         }
     }
@@ -225,6 +222,12 @@ class KossSelectQuery implements IKossQuery
         $this->_query_select = $query_select;
     }
 
+    public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
+    {
+        $columns = implode(', ', $columns);
+        return new self($pdo, "SELECT $columns FROM `$table`");
+    }
+
     public function where(string $column, string $operator, string $matches = null): KossSelectQuery
     {
         if ($matches == null) {
@@ -334,6 +337,13 @@ class KossUpdateQuery implements IKossQuery
         $columns = implode(', ', array_map($backtickify, array_keys($row)));
         $values = implode(', ', array_map($quotify, array_values($row)));
         return new self($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
+    }
+
+    public static function update(PDO $pdo, string $table, array $values, array $where): KossUpdateQuery
+    {
+        $values = Koss::assembleWhereClause($values);
+        $where = Koss::assembleWhereClause($where);
+        return new self($pdo, "UPDATE $table SET $values WHERE $where");
     }
 
     public function onDuplicateKey(array $values): KossUpdateQuery
