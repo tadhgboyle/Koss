@@ -3,6 +3,7 @@
 /**
  * 
  * Koss - Write MySQL queries faster than ever before in PHP
+ * Inspired by Laravel Eloquent
  * 
  * @author Tadhg Boyle
  * @since October 2020
@@ -85,7 +86,7 @@ class Koss
                 return $kossUpdateQuery->execute();
                 break;
             default:
-                throw new PDOException("Invalid start of MySQL query string. Token: $token.");
+                throw new PDOException("Unsupported start of MySQL query string. Token: $token.");
                 break;
         }
     }
