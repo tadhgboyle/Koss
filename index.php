@@ -29,7 +29,7 @@ echo '<br>';
 $results = $koss
     ->getSome('users', 'username')
     ->when(
-        is_null($_SESSION['user_id']),
+        is_null(null),
         fn () => $koss->orderBy('id', 'ASC')
     )
     ->limit(5)

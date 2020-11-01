@@ -2,6 +2,9 @@
 
 Write MySQL queries in PHP faster and easier than ever before.
 
+## Roadmap
+  - Add as a Composer project for easier usage
+
 ## Documentation
 
 ### Setup:
