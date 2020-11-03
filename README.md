@@ -1,7 +1,3 @@
-# Koss
-
-Write MySQL queries in PHP faster and easier than ever before.
-
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
