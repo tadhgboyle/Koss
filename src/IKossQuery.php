@@ -39,5 +39,6 @@ interface IKossQuery
     /**
      * Debugging only: Output the built string of all queries so far
      */
+    public function toString(): string;
     public function __toString(): string;
 }

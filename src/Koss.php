@@ -22,9 +22,9 @@ class Koss
     public function __construct(string $host, string $port, string $database, string $username, string $password)
     {
 
-        require_once 'IKossQuery.php';
-        require_once 'KossSelectQuery.php';
-        require_once 'KossUpdateQuery.php';
+        require_once('IKossQuery.php');
+        require_once('KossSelectQuery.php');
+        require_once('KossUpdateQuery.php');
 
         try {
             $this->_pdo = new PDO('mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database, $username, $password);
@@ -40,14 +40,14 @@ class Koss
      */
     public function getAll(string $table): KossSelectQuery
     {
-        return $this->getSome($table, '*');
+        return $this->getSome($table, ['*']);
     }
 
     /**
      * Get specified $columns in a $table
      * Initiates a KossSelectQuery instance
      */
-    public function getSome(string $table, string ...$columns): KossSelectQuery
+    public function getSome(string $table, array $columns): KossSelectQuery
     {
         $this->_query_instance = KossSelectQuery::get($this->_pdo, $table, $columns);
         return $this->_query_instance;
@@ -68,9 +68,9 @@ class Koss
      * Update an existing row
      * Initiates a KossUpdateQuery instance
      */
-    public function update(string $table, array $values, array $where): KossUpdateQuery
+    public function update(string $table, array $values): KossUpdateQuery
     {
-        $this->_query_instance = KossUpdateQuery::update($this->_pdo, $table, $values, $where);
+        $this->_query_instance = KossUpdateQuery::update($this->_pdo, $table, $values);
         return $this->_query_instance;
     }
 

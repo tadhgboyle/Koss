@@ -110,6 +110,11 @@ class KossSelectQuery implements IKossQuery
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
+    public function toString(): string
+    {
+        return $this->build();
+    }
+
     public function __toString(): string
     {
         return $this->build();

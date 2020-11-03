@@ -17,6 +17,7 @@ class KossUpdateQuery implements IKossQuery
 
     protected string
         $_query_insert = '',
+        $_query_where = '',
         $_query_duplicate_key = '',
         $_query_built = '';
 
@@ -30,24 +31,37 @@ class KossUpdateQuery implements IKossQuery
 
     public static function insert(PDO $pdo, string $table, array $row): KossUpdateQuery
     {
-        $quotify = function ($string) {
-            return '\'' . $string . '\'';
-        };
-        $backtickify = function ($string) {
-            return '`' . $string . '`';
-        };
-        $columns = implode(', ', array_map($backtickify, array_keys($row)));
-        $values = implode(', ', array_map($quotify, array_values($row)));
+        $columns = implode(', ', array_map(fn($string) => '`' . $string . '`', array_keys($row)));
+        $values = implode(', ', array_map(fn($string) => '\'' . $string . '\'', array_values($row)));
         return new self($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
     }
 
-    public static function update(PDO $pdo, string $table, array $values, array $where): KossUpdateQuery
+    public static function update(PDO $pdo, string $table, array $values): KossUpdateQuery
     {
-        $values = Koss::assembleWhereClause($values);
-        $where = Koss::assembleWhereClause($where);
-        return new self($pdo, "UPDATE $table SET $values WHERE $where");
+        $values_compiled = '';
+        foreach ($values as $column => $value) {
+            $values_compiled .= "`$column` = '$value', ";
+        }
+        $values_compiled = substr($values_compiled, 0, -2);
+        return new self($pdo, "UPDATE $table SET $values_compiled");
     }
 
+    public function where(string $column, string $operator, string $matches = null): KossUpdateQuery
+    {
+        if ($matches == null) {
+            $matches = $operator;
+            $operator = '=';
+        }
+
+        $this->_where[] = [
+            'column' => $column,
+            'operator' => $operator,
+            'matches' => $matches
+        ];
+
+        return $this;
+    }
+    
     public function onDuplicateKey(array $values): KossUpdateQuery
     {
         $compiled_values = '';
@@ -89,7 +103,12 @@ class KossUpdateQuery implements IKossQuery
     public function reset(): void
     {
         $this->_where = array();
-        $this->_query_insert = $this->_query_duplicate_key = '';
+        $this->_query_built = $this->_query_insert = $this->_query_duplicate_key = '';
+    }
+
+    public function toString(): string
+    {
+        return $this->build();
     }
 
     public function __toString(): string

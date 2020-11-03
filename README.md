@@ -8,7 +8,7 @@ Write MySQL queries in PHP faster and easier than ever before.
 ## Documentation
 
 ### Setup:
-  - `require 'Koss.php'` somewhere in your PHP script
+  - `require 'src/Koss.php'` somewhere in your PHP script
   - Initiate a new Koss instance by passing your MySQL login and database information.
   - Parameters:
     - 1: Hostname
@@ -40,7 +40,7 @@ Functions which are available in both Selection and Update/Insert queries.
   - `getAll(string $table)`
     - Select all columns in `$table`
     - Example SQL code: `SELECT * FROM users`
-  - `getSome(string $table, string ...$columns)`
+  - `getSome(string $table, array $columns)`
     - Select specific `$columns` in `$table`
     - Example SQL code: `SELECT username, first_name, last_name FROM users`
   - `groupBy(string $column)`
@@ -84,4 +84,12 @@ Functions which are not in Selection or Update/Insert queries
     - Common usage would be raw queries where Koss does not have functionality to help.
     - *Note: Cannot be mixed with other functions*
 
-[Look at our examples here.](https://github.com/Aberdeener/Koss/blob/main/index.php)
+### Examples:
+*All assuming you have autoloaded `Koss.php` and created a new instance of it with your database credentials.*
+
+  - Selecting information
+    ```php
+    $results = $koss->getSome('users', ['username', 'first_name'])->limit(5)->orderBy('username', 'DESC')->execute();
+
+    $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn() => $koss->limit(5))->execute();
+    ```

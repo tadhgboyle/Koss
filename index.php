@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require 'Koss.php';
+require 'src/Koss.php';
 require 'config.php'; /* Using config.php so I don't leak my password */
 
 $koss = new Koss('localhost', 3306, 'koss', 'tadhg', $password);
@@ -27,9 +27,8 @@ foreach ($results as $result) {
 echo '<br>';
 
 $results = $koss
-    ->getSome('users', 'username')
-    ->when(
-        is_null(null),
+    ->getSome('users', ['username'])
+    ->when(true,
         fn () => $koss->orderBy('id', 'ASC')
     )
     ->limit(5)
@@ -45,5 +44,12 @@ foreach ($results as $result) {
     echo print_r($result) . '<br>';
 }
 
-$result = $koss->insert('users', ['username' => 'aberdeener', 'first_name' => 'tadhg', 'last_name' => 'boyle'])->onDuplicateKey(['username' => 'Aber'])->execute();
+$result = $koss->insert('users', ['username' => rand(0, null), 'first_name' => 'tadhg', 'last_name' => 'boyle'])->onDuplicateKey(['username' => rand(0, null)])->execute();
 echo $result;
+
+echo '<br>';
+
+$result = $koss->update('users', ['username' => 'Bruh', 'first_name' => 'Tadhg'])->where('id', 1)->where('last_name', '!=', 'Boyle');
+echo $result;
+
+echo '<br>';
