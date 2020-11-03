@@ -4,6 +4,8 @@ Write MySQL queries in PHP faster and easier than ever before.
 
 ## Roadmap
   - Add as a Composer project for easier usage
+  - Add function to select specific columns after the initial `get()` function, for use in `when()` or similar
+  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate
 
 ## Documentation
 
@@ -89,7 +91,21 @@ Functions which are not in Selection or Update/Insert queries
 
   - Selecting information
     ```php
+    // Get the "username" and "first_name" column in the "users" table, limit to only the first 5 rows, and sort by their username descending.
     $results = $koss->getSome('users', ['username', 'first_name'])->limit(5)->orderBy('username', 'DESC')->execute();
+    // MySQL Output: SELECT `username`, `first_name` FROM `users` ORDER BY `username` DESC LIMIT 5
 
+    // Get all columns in the "users" table, and when they're logged in, limit to only the first 5 rows.
     $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn() => $koss->limit(5))->execute();
+    // MySQL Output: SELECT * FROM `users` LIMIT 5
+    ```
+
+  - Inserting information
+    ```php
+    // TODO
+    ```
+
+  - Updating information
+    ```php
+    // TODO
     ```

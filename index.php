@@ -53,3 +53,5 @@ $result = $koss->update('users', ['username' => 'Bruh', 'first_name' => 'Tadhg']
 echo $result;
 
 echo '<br>';
+
+echo $koss->getAll('users')->when(fn () => isset($_SESSION['logged_in']), fn () => $koss->limit(5));
