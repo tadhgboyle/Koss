@@ -33,7 +33,7 @@ class KossSelectQuery implements IKossQuery
 
     public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
     {
-        $columns = implode(', ', $columns[0] != '*' ? array_map(fn ($string) => '`' . $string . '`', $columns) : $columns);
+        $columns = implode(', ', ($columns[0] != '*') ? array_map(fn ($string) => "`$string`", $columns) : $columns);
         return new self($pdo, "SELECT $columns FROM `$table`");
     }
 

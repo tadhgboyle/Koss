@@ -27,7 +27,7 @@ class Koss
         require_once('KossUpdateQuery.php');
 
         try {
-            $this->_pdo = new PDO('mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database, $username, $password);
+            $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password);
             $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die($e->getMessage());

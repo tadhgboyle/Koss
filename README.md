@@ -8,7 +8,7 @@
 ## Documentation
 
 ### Setup:
-  - `require 'src/Koss.php'` somewhere in your PHP script
+  - `require 'src/Koss.php'` somewhere in your PHP script (This will be done automatically if you're using Composer)
   - Initiate a new Koss instance by passing your MySQL login and database information.
   - Parameters:
     - 1: Hostname
@@ -54,6 +54,16 @@ Functions which are available in both Selection and Update/Insert queries.
     - Example SQL code: `LIMIT 3`
 
 ### Update/Insert Functions:
+  - `update(string $table, array $values)`
+    - Updates any rows in the `$table` to new `$values`.
+    - Obviously, ***must*** be followed by at least one `where()` clause.
+    - `$values` must be an array in the format:
+      ```php
+      // Column name => Value
+      $values = array(
+        'username' => 'Aber'
+      );
+      ```
   - `insert(string $table, array $row)`
     - Inserts a new row into `$table`.
     - `$row` must be an array in the format:
@@ -84,7 +94,8 @@ Functions which are not in Selection or Update/Insert queries
     - Common usage would be raw queries where Koss does not have functionality to help.
     - *Note: Cannot be mixed with other functions*
 
-### Examples:
+## Examples
+
 *All assuming you have autoloaded `Koss.php` and created a new instance of it with your database credentials.*
 
   - Selecting information
@@ -100,10 +111,14 @@ Functions which are not in Selection or Update/Insert queries
 
   - Inserting information
     ```php
-    // TODO
+    // Insert a new row into the "users" table, if there is a unique row constraint, update only the username to "Aber"
+    $koss->insert('users', ['username' => 'Aberdeener', 'first_name' => 'tadhg', 'last_name' => 'boyle'])->onDuplicateKey(['username' => 'Aber'])->execute();
+    // MySQL Output: INSERT INTO `users` (`username`, `first_name`, `last_name`) VALUES ('Aberdeener', 'tadhg', 'boyle') ON DUPLICATE KEY UPDATE `username` = 'Aber' 
     ```
 
   - Updating information
     ```php
-    // TODO
+    // Update any existing rows in the "users" table which match the following criteria, update the username to "Aber" and the first_name to "Tadhg" where their "id" is 1 and their last_name is "Boyle"
+    $koss->update('users', ['username' => 'Aber', 'first_name' => 'Tadhg'])->where('id', 1)->where('last_name', '=', 'Boyle')->execute();
+    // MySQL Output: UPDATE `users` SET `username` = 'Aber', `first_name` = 'Tadhg' WHERE `id` = '1' AND `last_name` = 'Boyle' 
     ```

@@ -31,8 +31,8 @@ class KossUpdateQuery implements IKossQuery
 
     public static function insert(PDO $pdo, string $table, array $row): KossUpdateQuery
     {
-        $columns = implode(', ', array_map(fn($string) => '`' . $string . '`', array_keys($row)));
-        $values = implode(', ', array_map(fn($string) => '\'' . $string . '\'', array_values($row)));
+        $columns = implode(', ', array_map(fn($string) => "`$string`", array_keys($row)));
+        $values = implode(', ', array_map(fn($string) => "'$string'", array_values($row)));
         return new self($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
     }
 
@@ -43,7 +43,7 @@ class KossUpdateQuery implements IKossQuery
             $values_compiled .= "`$column` = '$value', ";
         }
         $values_compiled = substr($values_compiled, 0, -2);
-        return new self($pdo, "UPDATE $table SET $values_compiled");
+        return new self($pdo, "UPDATE `$table` SET $values_compiled");
     }
 
     public function where(string $column, string $operator, string $matches = null): KossUpdateQuery
