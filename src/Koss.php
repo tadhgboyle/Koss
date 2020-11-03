@@ -8,6 +8,7 @@
  * @author Tadhg Boyle
  * @since October 2020
  */
+namespace Koss;
 class Koss
 {
 

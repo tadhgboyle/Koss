@@ -1,0 +1,17 @@
+{
+    "name": "aberdeener/koss",
+    "description": "Write MySQL queries in PHP faster and easier than ever before.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tadhg",
+            "email": "tadhgsmboyle@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Koss\\Koss": "src/"
+        }
+    }
+}
