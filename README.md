@@ -1,7 +1,6 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Add as a Composer project for easier usage
   - Add function to select specific columns after the initial `get()` function, for use in `when()` or similar
   - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate
   - Allow `where()` to take (nested) arrays
