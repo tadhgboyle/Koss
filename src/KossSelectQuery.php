@@ -25,16 +25,24 @@ class KossSelectQuery implements IKossQuery
 
     protected array $_where = array();
 
-    public function __construct(PDO $pdo, string $query_select)
+    public function __construct(PDO $pdo, string $query_select, string $query_from = null)
     {
         $this->_pdo = $pdo;
         $this->_query_select = $query_select;
+        if ($query_from != null) $this->_query_from = $query_from;
     }
 
     public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
     {
         $columns = implode(', ', ($columns[0] != '*') ? array_map(fn ($string) => "`$string`", $columns) : $columns);
-        return new self($pdo, "SELECT $columns FROM `$table`");
+        return new self($pdo, "SELECT $columns", "FROM `$table`");
+    }
+
+    public function columns(array $columns): KossSelectQuery
+    {
+        if (substr($this->_query_select, -1) != ',') $this->_query_select .= ', ';
+        $this->_query_select .= implode(', ', array_map(fn ($string) => "`$string`", $columns));
+        return $this;
     }
 
     public function where(string $column, string $operator, string $matches = null): KossSelectQuery
@@ -82,12 +90,6 @@ class KossSelectQuery implements IKossQuery
         return $this;
     }
 
-    public function build(): string
-    {
-        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Koss::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
-        return $this->_query_built;
-    }
-
     public function execute(): array
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
@@ -102,6 +104,12 @@ class KossSelectQuery implements IKossQuery
             } else die(print_r($this->_pdo->errorInfo()));
         }
         return null;
+    }
+
+    public function build(): string
+    {
+        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Koss::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+        return $this->_query_built;
     }
 
     public function reset(): void

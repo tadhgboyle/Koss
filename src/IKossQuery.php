@@ -22,14 +22,14 @@ interface IKossQuery
     public function when($expression, callable $callback, callable $fallback = null): IKossQuery;
 
     /**
-     * Assemble queries into MySQL statement
-     */
-    public function build(): string;
-
-    /**
      * Execute repsective query and store result
      */
     public function execute();
+
+    /**
+     * Assemble queries into MySQL statement
+     */
+    public function build(): string;
 
     /**
      * Reset query strings

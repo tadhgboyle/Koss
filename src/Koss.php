@@ -40,7 +40,7 @@ class Koss
      */
     public function getAll(string $table): KossSelectQuery
     {
-        return $this->getSome($table, ['*']);
+        return $this->getSome($table, array('*'));
     }
 
     /**
@@ -103,7 +103,7 @@ class Koss
      * @param mixed $callback - Ran if $expression is true
      * @param mixed $fallback (optional) - Ran if $expression is false
      */
-    public static function when($expression, $callback, $fallback = null): void
+    public static function when($expression, callable $callback, callable $fallback = null): void
     {
         if ((is_callable($expression) && $expression()) || $expression) {
             $callback();
@@ -112,6 +112,24 @@ class Koss
         }
     }
 
+    /**
+     * Assemble all where clauses into one string using appropriate MySQL syntax
+     */
+    public static function assembleWhereClause(array $where): string
+    {
+        $first = true;
+        $return = '';
+        foreach ($where as $clause) {
+            if ($first) {
+                $return .= 'WHERE ';
+                $first = false;
+            } else $return .= 'AND ';
+
+            $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
+        }
+        return $return;
+    }
+    
     /**
      * Janky workaround for when()
      */
@@ -150,23 +168,5 @@ class Koss
     public function like(string $column, string $like): void
     {
         $this->_query_instance->like($column, $like);
-    }
-
-    /**
-     * Assemble all where clauses into one string using appropriate MySQL syntax
-     */
-    public static function assembleWhereClause(array $where): string
-    {
-        $first = true;
-        $return = '';
-        foreach ($where as $clause) {
-            if ($first) {
-                $return .= 'WHERE ';
-                $first = false;
-            } else $return .= 'AND ';
-
-            $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
-        }
-        return $return;
     }
 }

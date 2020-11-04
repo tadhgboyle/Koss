@@ -42,7 +42,7 @@ class KossUpdateQuery implements IKossQuery
         foreach ($values as $column => $value) {
             $values_compiled .= "`$column` = '$value', ";
         }
-        $values_compiled = substr($values_compiled, 0, -2);
+        $values_compiled = rtrim($values_compiled, ',');
         return new self($pdo, "UPDATE `$table` SET $values_compiled");
     }
 
@@ -78,12 +78,6 @@ class KossUpdateQuery implements IKossQuery
         return $this;
     }
 
-    public function build(): string
-    {
-        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Koss::assembleWhereClause($this->_where);
-        return $this->_query_built;
-    }
-
     public function execute()
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
@@ -97,9 +91,15 @@ class KossUpdateQuery implements IKossQuery
                 }
             } else die(print_r($this->_pdo->errorInfo()));
         }
-        return null;
+        return -1;
     }
 
+    public function build(): string
+    {
+        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Koss::assembleWhereClause($this->_where);
+        return $this->_query_built;
+    }
+    
     public function reset(): void
     {
         $this->_where = array();

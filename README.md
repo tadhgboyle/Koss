@@ -1,9 +1,9 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Add function to select specific columns after the initial `get()` function, for use in `when()` or similar
   - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate
   - Allow `where()` to take (nested) arrays
+  - "Protect" double selections in `columns()`
 
 ## Documentation
 
@@ -52,6 +52,9 @@ Functions which are available in both Selection and Update/Insert queries.
   - `limit(int $limit)`
     - Only return `$limit` rows.
     - Example SQL code: `LIMIT 3`
+  - `columns(array $columns)`
+    - Also select `$columns` as well as whatever was passed in the original `getSome()`
+    - Example SQL code: `SELECT username, first_name`
 
 ### Update/Insert Functions:
   - `update(string $table, array $values)`
@@ -107,6 +110,10 @@ Functions which are not in Selection or Update/Insert queries
     // Get all columns in the "users" table, and when they're logged in, limit to only the first 5 rows.
     $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn() => $koss->limit(5))->execute();
     // MySQL Output: SELECT * FROM `users` LIMIT 5
+
+    // Get the "username" column in the "users" table, but also select the "last_name" column.
+    $results = $koss->getSome('users', ['username'])->columns(['last_name'])->execute();
+    // MySQL Output: SELECT `username`, `last_name` FROM `users`
     ```
 
   - Inserting information
