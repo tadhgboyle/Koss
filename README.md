@@ -1,9 +1,8 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate
-  - Allow `where()` to take (nested) arrays
-  - "Protect" double selections in `columns()`
+  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate the internal code
+  - Allow `where()` to take arrays and nested arrays
 
 ## Documentation
 
@@ -16,6 +15,8 @@
     - 3: Database name
     - 4: Username
     - 5: Password
+
+*Note: Your order of functions does not matter. You can `limit()` and then choose to select more columns via `columns()` after.*
 
 ### Core Functions:
 Functions which are available in both Selection and Update/Insert queries.

@@ -82,12 +82,12 @@ class Koss
         $token = explode(' ', $query)[0];
         switch ($token) {
             case "SELECT":
-                $kossSelectQuery = new KossSelectQuery($this->_pdo, $query);
+                $kossSelectQuery = new KossSelectQuery($this->_pdo, array(), $query);
                 return $kossSelectQuery->execute();
                 break;
             case "INSERT":
             case "UPDATE":
-                $kossUpdateQuery = new KossUpdateQuery($this->_pdo, $query);
+                $kossUpdateQuery = new KossUpdateQuery($this->_pdo, array(), $query);
                 return $kossUpdateQuery->execute();
                 break;
             default:

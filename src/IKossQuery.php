@@ -12,11 +12,6 @@ interface IKossQuery
 {
 
     /**
-     * Create new instance of a KossQuery by injecting the beginning statement
-     */
-    public function __construct(PDO $pdo, string $query);
-
-    /**
      * Execute Koss function under certain conditions
      */
     public function when($expression, callable $callback, callable $fallback = null): IKossQuery;

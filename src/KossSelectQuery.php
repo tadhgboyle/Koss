@@ -25,8 +25,11 @@ class KossSelectQuery implements IKossQuery
 
     protected array $_where = array();
 
-    public function __construct(PDO $pdo, string $query_select, string $query_from = null)
+    protected array $_selected_columns = array();
+
+    public function __construct(PDO $pdo, array $columns, string $query_select, string $query_from = null)
     {
+        array_map(fn($column) => $this->_selected_columns[] = $column, $columns);
         $this->_pdo = $pdo;
         $this->_query_select = $query_select;
         if ($query_from != null) $this->_query_from = $query_from;
@@ -34,14 +37,20 @@ class KossSelectQuery implements IKossQuery
 
     public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
     {
-        $columns = implode(', ', ($columns[0] != '*') ? array_map(fn ($string) => "`$string`", $columns) : $columns);
-        return new self($pdo, "SELECT $columns", "FROM `$table`");
+        $new_columns = implode(', ', ($columns[0] != '*') ? array_map(fn ($string) => "`$string`", $columns) : $columns);
+        return new self($pdo, $columns, "SELECT $new_columns", "FROM `$table`");
     }
 
     public function columns(array $columns): KossSelectQuery
     {
+        $new_columns = array();
+        foreach ($columns as $column) {
+            if (!in_array($column, $this->_selected_columns)) {
+                $new_columns[] = $column;
+            }
+        }
         if (substr($this->_query_select, -1) != ',') $this->_query_select .= ', ';
-        $this->_query_select .= implode(', ', array_map(fn ($string) => "`$string`", $columns));
+        $this->_query_select .= implode(', ', array_map(fn ($string) => "`$string`", $new_columns));
         return $this;
     }
 
@@ -114,7 +123,7 @@ class KossSelectQuery implements IKossQuery
 
     public function reset(): void
     {
-        $this->_where = array();
+        $this->_where = $this->_selected_columns = array();
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
