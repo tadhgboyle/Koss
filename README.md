@@ -68,6 +68,7 @@ Functions which are available in both Selection and Update/Insert queries.
         'username' => 'Aber'
       );
       ```
+      - Example SQL code: `UPDATE users SET username = 'Aberdeener' WHERE ...`
   - `insert(string $table, array $row)`
     - Inserts a new row into `$table`.
     - `$row` must be an array in the format:
