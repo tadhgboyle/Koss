@@ -1,8 +1,8 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate the internal code
   - Allow `where()` to take arrays and nested arrays
+  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate the internal code
 
 ## Documentation
 

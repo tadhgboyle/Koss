@@ -87,7 +87,7 @@ class Koss
                 break;
             case "INSERT":
             case "UPDATE":
-                $kossUpdateQuery = new KossUpdateQuery($this->_pdo, array(), $query);
+                $kossUpdateQuery = new KossUpdateQuery($this->_pdo, $query);
                 return $kossUpdateQuery->execute();
                 break;
             default:
