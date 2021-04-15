@@ -25,7 +25,7 @@ class Koss
     protected array $_where = array();
 
     protected $_query_instance;
-    
+
     /**
      * Create new Koss instance.
      *

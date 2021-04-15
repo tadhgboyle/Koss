@@ -103,7 +103,7 @@ class KossSelectQuery implements IKossQuery
         return $this;
     }
 
-    public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery
+    public function when(callable|bool $expression, callable $callback, callable $fallback = null): KossSelectQuery
     {
         KossUtil::when($this, $expression, $callback, $fallback);
 

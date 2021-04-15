@@ -5,8 +5,8 @@ namespace Aberdeener\Koss\Queries;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Aberdeener\Koss\Queries\IKossQuery;
 use Aberdeener\Koss\Util\KossUtil;
+use Aberdeener\Koss\Queries\IKossQuery;
 
 class KossUpdateQuery implements IKossQuery
 {
@@ -88,7 +88,7 @@ class KossUpdateQuery implements IKossQuery
         return $this;
     }
 
-    public function when($expression, callable $callback, callable $fallback = null): KossUpdateQuery
+    public function when(callable|bool $expression, callable $callback, callable $fallback = null): KossUpdateQuery
     {
         KossUtil::when($this, $expression, $callback, $fallback);
 

@@ -8,7 +8,7 @@ interface IKossQuery
     /**
      * Execute Koss function under certain conditions
      */
-    public function when($expression, callable $callback, callable $fallback = null): IKossQuery;
+    public function when(callable|bool $expression, callable $callback, callable $fallback = null): IKossQuery;
 
     /**
      * Execute repsective query and store result

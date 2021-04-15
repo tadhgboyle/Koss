@@ -7,23 +7,30 @@ use Aberdeener\Koss\Queries\IKossQuery;
 
 class KossUtil
 {
+
     /**
      * Run a Koss function only when the specified $expression is true.
      * 
-     * @param IKossQuery $instance Instance of Select/Update query class to pass in background to callable function.
+     * @param IKossQuery $instance Current instance of Select/Update query to pass in background to callable function.
      * @param callable|bool $expression Expression to run, must return bool
      * @param callable $callback Ran if $expression is true
      * @param callable $fallback (optional) Ran if $expression is false
      */
     public static function when(IKossQuery $instance, callable|bool $expression, callable $callback, callable $fallback = null): void
     {
-        if ((is_callable($expression) && $expression()) || $expression) {
+        $expression_bool = is_callable($expression) ? $expression() : $expression;
+
+        if ($expression_bool) {
             $callback($instance);
-        } else if (((is_callable($expression) && !$expression()) || !$expression) && $fallback != null) {
+            return;
+        }
+
+        else if ($fallback != null) {
             $fallback($instance);
+            return;
         }
     }
-    
+
     /**
      * Create an array of `column`, `operator` and `matches` for WHERE clauses.
      * Validates that $operator is valid.
@@ -67,7 +74,7 @@ class KossUtil
                 $return .= 'WHERE ';
                 $first = false;
             } else {
-                $return .= 'AND ';
+                $return .= 'AND '; // TODO: Allow changing to `OR`
             }
 
             $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
