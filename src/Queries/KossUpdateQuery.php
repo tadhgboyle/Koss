@@ -5,8 +5,8 @@ namespace Aberdeener\Koss\Queries;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Aberdeener\Koss\Koss;
-use Aberdeener\Koss\Util\IKossQuery;
+use Aberdeener\Koss\Queries\IKossQuery;
+use Aberdeener\Koss\Util\KossUtil;
 
 class KossUpdateQuery implements IKossQuery
 {
@@ -45,8 +45,8 @@ class KossUpdateQuery implements IKossQuery
      */
     public static function insert(PDO $pdo, string $table, array $row): KossUpdateQuery
     {
-        $columns = implode(', ', Koss::escapeStrings(array_keys($row)));
-        $values = implode(', ', Koss::escapeStrings(array_values($row), '\''));
+        $columns = implode(', ', KossUtil::escapeStrings(array_keys($row)));
+        $values = implode(', ', KossUtil::escapeStrings(array_values($row), '\''));
 
         return new KossUpdateQuery($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
     }
@@ -66,7 +66,7 @@ class KossUpdateQuery implements IKossQuery
 
     public function where(string $column, string $operator, string $matches = null): KossUpdateQuery
     {
-        $append = Koss::handleWhereOperation($column, $operator, $matches);
+        $append = KossUtil::handleWhereOperation($column, $operator, $matches);
 
         if ($append != null) {
             $this->_where[] = $append;
@@ -90,7 +90,7 @@ class KossUpdateQuery implements IKossQuery
 
     public function when($expression, callable $callback, callable $fallback = null): KossUpdateQuery
     {
-        Koss::when($this, $expression, $callback, $fallback);
+        KossUtil::when($this, $expression, $callback, $fallback);
 
         return $this;
     }
@@ -120,7 +120,7 @@ class KossUpdateQuery implements IKossQuery
 
     public function build(): string
     {
-        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Koss::assembleWhereClause($this->_where);
+        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . KossUtil::assembleWhereClause($this->_where);
         
         return $this->_query_built;
     }

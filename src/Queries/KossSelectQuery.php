@@ -5,8 +5,8 @@ namespace Aberdeener\Koss\Queries;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Aberdeener\Koss\Koss;
-use Aberdeener\Koss\Util\IKossQuery;
+use Aberdeener\Koss\Util\KossUtil;
+use Aberdeener\Koss\Queries\IKossQuery;
 
 class KossSelectQuery implements IKossQuery
 {
@@ -40,7 +40,7 @@ class KossSelectQuery implements IKossQuery
 
     public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
     {
-        $new_columns = implode(', ', ($columns[0] != '*') ? Koss::escapeStrings($columns) : $columns);
+        $new_columns = implode(', ', ($columns[0] != '*') ? KossUtil::escapeStrings($columns) : $columns);
 
         return new KossSelectQuery($pdo, $columns, "SELECT $new_columns", "FROM `$table`");
     }
@@ -59,7 +59,7 @@ class KossSelectQuery implements IKossQuery
             $this->_query_select .= ', ';
         }
 
-        $this->_query_select .= implode(', ', Koss::escapeStrings($new_columns));
+        $this->_query_select .= implode(', ', KossUtil::escapeStrings($new_columns));
 
         return $this;
     }
@@ -71,7 +71,7 @@ class KossSelectQuery implements IKossQuery
 
     public function where(string $column, string $operator, string $matches = null): KossSelectQuery
     {
-        $append = Koss::handleWhereOperation($column, $operator, $matches);
+        $append = KossUtil::handleWhereOperation($column, $operator, $matches);
 
         if ($append != null) {
             $this->_where[] = $append;
@@ -105,7 +105,7 @@ class KossSelectQuery implements IKossQuery
 
     public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery
     {
-        Koss::when($this, $expression, $callback, $fallback);
+        KossUtil::when($this, $expression, $callback, $fallback);
 
         return $this;
     }
@@ -136,7 +136,7 @@ class KossSelectQuery implements IKossQuery
 
     public function build(): string
     {
-        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Koss::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . KossUtil::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
         return $this->_query_built;
     }
 

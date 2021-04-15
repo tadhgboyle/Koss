@@ -11,7 +11,7 @@
 - Requires PHP 8.0
 
 ### Setup:
-  - `require 'src/Koss.php'` somewhere in your PHP script (This will be done automatically if you're using Composer)
+  - Autoload Koss using Composer.
   - Initiate a new Koss instance by passing your MySQL login and database information.
   - Parameters:
     - 1: Hostname

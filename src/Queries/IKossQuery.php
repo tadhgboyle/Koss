@@ -1,6 +1,6 @@
 <?php
 
-namespace Aberdeener\Koss\Util;
+namespace Aberdeener\Koss\Queries;
 
 interface IKossQuery
 {
