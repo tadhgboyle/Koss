@@ -19,7 +19,7 @@ interface IKossQuery
     /**
      * Execute repsective query and store result
      */
-    public function execute();
+    public function execute(): mixed;
 
     /**
      * Assemble queries into MySQL statement

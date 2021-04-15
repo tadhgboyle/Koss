@@ -29,50 +29,60 @@ class KossSelectQuery implements IKossQuery
 
     public function __construct(PDO $pdo, array $columns, string $query_select, string $query_from = null)
     {
-        array_map(fn($column) => $this->_selected_columns[] = $column, $columns);
         $this->_pdo = $pdo;
+        $this->_selected_columns = $columns;
         $this->_query_select = $query_select;
-        if ($query_from != null) $this->_query_from = $query_from;
+
+        if ($query_from != null) {
+            $this->_query_from = $query_from;
+        }
     }
 
     public static function get(PDO $pdo, string $table, array $columns): KossSelectQuery
     {
-        $new_columns = implode(', ', ($columns[0] != '*') ? array_map(fn ($string) => "`$string`", $columns) : $columns);
-        return new self($pdo, $columns, "SELECT $new_columns", "FROM `$table`");
+        $new_columns = implode(', ', ($columns[0] != '*') ? Koss::escapeStrings($columns) : $columns);
+
+        return new KossSelectQuery($pdo, $columns, "SELECT $new_columns", "FROM `$table`");
     }
 
     public function columns(array $columns): KossSelectQuery
     {
         $new_columns = array();
+
         foreach ($columns as $column) {
             if (!in_array($column, $this->_selected_columns)) {
                 $new_columns[] = $column;
             }
         }
-        if (substr($this->_query_select, -1) != ',') $this->_query_select .= ', ';
-        $this->_query_select .= implode(', ', array_map(fn ($string) => "`$string`", $new_columns));
+
+        if (substr($this->_query_select, -1) != ',') {
+            $this->_query_select .= ', ';
+        }
+
+        $this->_query_select .= implode(', ', Koss::escapeStrings($new_columns));
+
         return $this;
+    }
+
+    public function column(string $column): KossSelectQuery 
+    {
+        return $this->columns([$column]);
     }
 
     public function where(string $column, string $operator, string $matches = null): KossSelectQuery
     {
-        if ($matches == null) {
-            $matches = $operator;
-            $operator = '=';
-        }
+        $append = Koss::handleWhereOperation($column, $operator, $matches);
 
-        $this->_where[] = [
-            'column' => $column,
-            'operator' => $operator,
-            'matches' => $matches
-        ];
+        if ($append != null) {
+            $this->_where[] = $append;
+        }
 
         return $this;
     }
 
     public function like(string $column, string $like): KossSelectQuery
     {
-        return $this->where($column, 'LIKE', "%$like%");
+        return $this->where($column, 'LIKE', $like);
     }
 
     public function groupBy(string $column): KossSelectQuery
@@ -95,7 +105,8 @@ class KossSelectQuery implements IKossQuery
 
     public function when($expression, callable $callback, callable $fallback = null): KossSelectQuery
     {
-        Koss::when($expression, $callback, $fallback);
+        Koss::when($this, $expression, $callback, $fallback);
+
         return $this;
     }
 
@@ -103,15 +114,23 @@ class KossSelectQuery implements IKossQuery
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
             if ($this->_query->execute()) {
+
                 try {
+
                     $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
                     $this->reset();
+
                     return $this->_result;
+
                 } catch (PDOException $e) {
                     die($e->getMessage());
                 }
-            } else die(print_r($this->_pdo->errorInfo()));
+
+            } else {
+                die(print_r($this->_pdo->errorInfo()));
+            }
         }
+
         return null;
     }
 

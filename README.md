@@ -2,9 +2,13 @@
 
 ## Roadmap
   - Allow `where()` to take arrays and nested arrays
+  - Allow `where()` and `like()` to somehow use `OR` instead of always `AND`.
+  - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
   - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate the internal code
 
 ## Documentation
+
+- Requires PHP 8.0
 
 ### Setup:
   - `require 'src/Koss.php'` somewhere in your PHP script (This will be done automatically if you're using Composer)
@@ -26,14 +30,14 @@ Functions which are available in both Selection and Update/Insert queries.
   - `when(callable|bool $expression, callable $callback, callable $fallback)`
     - Only execute `$callback` function when `$expression` is true. If `$fallback` is provided, it will be called when `$expression` is false.
     - *Note: `$expression` can be either a boolean value (`5 < 10`) or an anonymous function which returns a boolean value*
-    - *Note: `$callback` and `$fallback` must `use ($koss)` rather than passing it as a normal parameter, or be a shorthand `fn()`*
     - *Note: Only some Koss functions are supported in `when()` statements. Functions: `limit()`, `orderBy()`, `where()`, `groupBy()`, `like()`*
   - `where(string $column, string $operator, string $matches)`
     - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are `$operator` to `$match`
     - *Note: If `$operator` is not provided, `'='` will be assumed*
     - Example SQL code: `WHERE username <> 'Aberdeener'`
   - `like(string $column, string $like)`
-    - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are similar to to `%$like%`
+    - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are similar to to `$like`.
+    - You must provide the `%` where you want them to be, Koss cannot assume anything.
     - *Note: Multiple `like` and `where` clauses can be passed and Koss will handle compiling the correct MySQL code*
     - Example SQL code: `WHERE first_name LIKE %Tadhg%`
 
@@ -41,8 +45,8 @@ Functions which are available in both Selection and Update/Insert queries.
   - `getAll(string $table)`
     - Select all columns in `$table`
     - Example SQL code: `SELECT * FROM users`
-  - `getSome(string $table, array $columns)`
-    - Select specific `$columns` in `$table`
+  - `getSome(string $table, array|string $columns)`
+    - Select specific `$columns` (or just one column if a string is provided) in `$table`
     - Example SQL code: `SELECT username, first_name, last_name FROM users`
   - `groupBy(string $column)`
     - Group together rows with same `$column` values
@@ -108,13 +112,14 @@ Functions which are not in Selection or Update/Insert queries
     // Get the "username" and "first_name" column in the "users" table, limit to only the first 5 rows, and sort by their username descending.
     $results = $koss->getSome('users', ['username', 'first_name'])->limit(5)->orderBy('username', 'DESC')->execute();
     // MySQL Output: SELECT `username`, `first_name` FROM `users` ORDER BY `username` DESC LIMIT 5
-
+ 
     // Get all columns in the "users" table, and when they're logged in, limit to only the first 5 rows.
-    $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn() => $koss->limit(5))->execute();
+    // Note the usage of new variable, $query in anonymous function. This will be passed by Koss.
+    $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn(KossSelectQuery $query) => $query->limit(5))->execute();
     // MySQL Output: SELECT * FROM `users` LIMIT 5
 
     // Get the "username" column in the "users" table, but also select the "last_name" column.
-    $results = $koss->getSome('users', ['username'])->columns(['last_name'])->execute();
+    $results = $koss->getSome('users', 'username')->columns(['last_name'])->execute();
     // MySQL Output: SELECT `username`, `last_name` FROM `users`
     ```
 
