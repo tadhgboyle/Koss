@@ -1,13 +1,13 @@
 <?php
 
-/**
- * 
- * Koss - Write MySQL queries faster than ever before in PHP
- * Inspired by Laravel Eloquent
- * 
- * @author Tadhg Boyle
- * @since October 2020
- */
+namespace Aberdeener\Koss\Queries;
+
+use PDO;
+use PDOException;
+use PDOStatement;
+use Aberdeener\Koss\Koss;
+use Aberdeener\Koss\Util\IKossQuery;
+
 class KossSelectQuery implements IKossQuery
 {
 

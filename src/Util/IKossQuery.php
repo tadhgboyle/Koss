@@ -1,13 +1,7 @@
 <?php
 
-/**
- * 
- * Koss - Write MySQL queries faster than ever before in PHP
- * Inspired by Laravel Eloquent
- * 
- * @author Tadhg Boyle
- * @since October 2020
- */
+namespace Aberdeener\Koss\Util;
+
 interface IKossQuery
 {
 

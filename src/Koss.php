@@ -1,5 +1,13 @@
 <?php
 
+namespace Aberdeener\Koss;
+
+use PDO;
+use PDOException;
+use Aberdeener\Koss\Util\IKossQuery;
+use Aberdeener\Koss\Queries\KossSelectQuery;
+use Aberdeener\Koss\Queries\KossUpdateQuery;
+
 /**
  * 
  * Koss - Write MySQL queries faster than ever before in PHP
@@ -30,10 +38,6 @@ class Koss
      */
     public function __construct(string $host, int $port, string $database, string $username, string $password)
     {
-        require_once('IKossQuery.php');
-        require_once('KossSelectQuery.php');
-        require_once('KossUpdateQuery.php');
-
         try {
 
             $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password);
