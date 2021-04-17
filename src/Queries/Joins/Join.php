@@ -3,6 +3,7 @@
 namespace Aberdeener\Koss\Queries\Joins;
 
 use ReflectionClass;
+use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Exceptions\JoinException;
 
@@ -19,7 +20,7 @@ class Join
 
     public function __construct(string $keyword, SelectQuery $query_instance)
     {
-        if (!in_array($keyword, ['INNER', 'OUTER'])) {
+        if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER', 'FULL OUTER'])) {
             throw new JoinException("Invalid JOIN clause keyword. Keyword: $keyword");
         }
 
@@ -73,7 +74,13 @@ class Join
      */
     private function build(): string
     {
-        return $this->_keyword . ' JOIN ' . $this->_table . ' ON ' . $this->_table . '.' . $this->_foreign_id . ' = ' . $this->_query_instance->getTable() . '.' . $this->_local_id;
+        $class = new ReflectionClass(SelectQuery::class);
+        $table_prop = $class->getProperty('_table');
+        $table_prop->setAccessible(true);
+        $table = $table_prop->getValue($this->_query_instance);
+        $table_prop->setAccessible(false);
+
+        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . $this->_table . '.' . $this->_foreign_id . ' = ' . $table . '.' . $this->_local_id;
     }
 
     /**

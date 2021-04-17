@@ -12,15 +12,12 @@ class UpdateQuery implements Query
 {
     
     protected PDO $_pdo;
-
     protected PDOStatement $_query;
 
-    protected string
-        $_query_insert = '',
-        $_query_where = '',
-        $_query_duplicate_key = '',
-        $_query_built = '';
-
+    protected string $_query_insert = '';
+    protected string $_query_where = '';
+    protected string $_query_duplicate_key = '';
+    protected string $_query_built = '';
     protected array $_where = array();
     
     /**

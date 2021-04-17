@@ -8,29 +8,25 @@ use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
-use Aberdeener\Koss\Queries\Joins\OuterJoin;
+use Aberdeener\Koss\Queries\Joins\FullOuterJoin;
+use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
+use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 
 class SelectQuery implements Query
 {
 
     protected PDO $_pdo;
-
     protected PDOStatement $_query;
 
     protected string $_table;
-
-    protected string
-        $_query_select = '',
-        $_query_from = '',
-        $_query_group_by = '',
-        $_query_order_by = '',
-        $_query_limit = '',
-        $_query_built = '';
-
+    protected string $_query_select = '';
+    protected string $_query_from = '';
+    protected string $_query_group_by = '';
+    protected string $_query_order_by = '';
+    protected string $_query_limit = '';
+    protected string $_query_built = '';
     protected array $_where = array();
-
     protected array $_joins = array();
-
     protected array $_selected_columns = array();
 
     public function __construct(PDO $pdo, array $columns, string $query_select, string $query_from = null, string $table = null)
@@ -116,18 +112,44 @@ class SelectQuery implements Query
     }
 
     /**
-     * Preform an OUTER JOIN on this select statement.
+     * Preform a LEFT OUTER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `OuterJoin` param.
+     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function outerJoin(callable $callback): SelectQuery
+    public function leftOuterJoin(callable $callback): SelectQuery
     {
-        $callback(new OuterJoin($this));
+        $callback(new LeftOuterJoin($this));
         
         return $this;
     }
-    
+
+    /**
+     * Preform a RIGHT OUTER JOIN on this select statement.
+     *
+     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function rightOuterJoin(callable $callback): SelectQuery
+    {
+        $callback(new RightOuterJoin($this));
+
+        return $this;
+    }
+
+    /**
+     * Preform a FULL OUTER JOIN on this select statement.
+     *
+     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function fullOuterJoin(callable $callback): SelectQuery
+    {
+        $callback(new FullOuterJoin($this));
+
+        return $this;
+    }
+
     /**
      * Add a LIKE statement to this query.
      * Rereoutes to `where()` and uses `"LIKE"` as the operator.
@@ -194,11 +216,6 @@ class SelectQuery implements Query
     {
         $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
         return $this->_query_built;
-    }
-
-    public function getTable(): string
-    {
-        return $this->_table;
     }
 
     public function reset(): void

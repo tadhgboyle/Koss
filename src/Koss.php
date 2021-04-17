@@ -4,14 +4,14 @@ namespace Aberdeener\Koss;
 
 use PDO;
 use PDOException;
+use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Queries\UpdateQuery;
 use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * 
- * Koss - Write MySQL queries faster than ever before in PHP
- * Inspired by Laravel Eloquent
+ * Koss - Write MySQL queries faster than ever before in PHP.
  * 
  * @author Tadhg Boyle
  * @since October 2020
@@ -20,12 +20,12 @@ class Koss
 {
 
     protected PDO $_pdo;
-
     protected PDOStatement $_query;
+
+    protected Query $_query_instance;
 
     protected array $_where = array();
 
-    protected $_query_instance;
 
     /**
      * Create new Koss instance.

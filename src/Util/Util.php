@@ -101,15 +101,19 @@ class Util
     }
 
     /**
-     * Escape array of strings by adding $key to front and end of each string. 
+     * Escape array of strings or single string by adding $key to front and end of each string. 
      * Used for preparing column and values for use in query statements.
      *
-     * @param array $strings Strings to be escaped.
+     * @param array|string $strings Strings to be escaped.
      * @param string $key Key to add to front and end of each string.
-     * @return array Escaped strings.
+     * @return array|string Escaped strings.
      */
-    public static function escapeStrings(array $strings, string $key = '`'): array
+    public static function escapeStrings(array|string $strings, string $key = '`'): array|string
     {
+        if (!is_array($strings)) {
+            return $key . $strings . $key;
+        }
+        
         $escaped = array();
 
         foreach ($strings as $string) {
