@@ -5,10 +5,10 @@ namespace Aberdeener\Koss\Queries;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Aberdeener\Koss\Util\KossUtil;
-use Aberdeener\Koss\Queries\IKossQuery;
+use Aberdeener\Koss\Util\Util;
+use Aberdeener\Koss\Queries\Query;
 
-class KossUpdateQuery implements IKossQuery
+class UpdateQuery implements Query
 {
     
     protected PDO $_pdo;
@@ -24,7 +24,7 @@ class KossUpdateQuery implements IKossQuery
     protected array $_where = array();
     
     /**
-     * Create new instance of KossUpdateQuery. Should only be used internally by Koss.
+     * Create new instance of UpdateQuery. Should only be used internally by Koss.
      *
      * @param PDO $pdo PDO connection to be used.
      * @param string $query 
@@ -41,17 +41,17 @@ class KossUpdateQuery implements IKossQuery
      * @param PDO $pdo PDO instance to be used.
      * @param string $table Table to update.
      * @param array $row Column name/Value pairs to insert into table.
-     * @return KossUpdateQuery New instance of UpdateQuery class.
+     * @return UpdateQuery New instance of UpdateQuery class.
      */
-    public static function insert(PDO $pdo, string $table, array $row): KossUpdateQuery
+    public static function insert(PDO $pdo, string $table, array $row): UpdateQuery
     {
-        $columns = implode(', ', KossUtil::escapeStrings(array_keys($row)));
-        $values = implode(', ', KossUtil::escapeStrings(array_values($row), '\''));
+        $columns = implode(', ', Util::escapeStrings(array_keys($row)));
+        $values = implode(', ', Util::escapeStrings(array_values($row), '\''));
 
-        return new KossUpdateQuery($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
+        return new UpdateQuery($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
     }
 
-    public static function update(PDO $pdo, string $table, array $values): KossUpdateQuery
+    public static function update(PDO $pdo, string $table, array $values): UpdateQuery
     {
         $values_compiled = '';
 
@@ -61,12 +61,12 @@ class KossUpdateQuery implements IKossQuery
 
         $values_compiled = rtrim($values_compiled, ',');
 
-        return new KossUpdateQuery($pdo, "UPDATE `$table` SET $values_compiled");
+        return new UpdateQuery($pdo, "UPDATE `$table` SET $values_compiled");
     }
 
-    public function where(string $column, string $operator, string $matches = null): KossUpdateQuery
+    public function where(string $column, string $operator, string $matches = null): UpdateQuery
     {
-        $append = KossUtil::handleWhereOperation($column, $operator, $matches);
+        $append = Util::handleWhereOperation($column, $operator, $matches);
 
         if ($append != null) {
             $this->_where[] = $append;
@@ -75,7 +75,7 @@ class KossUpdateQuery implements IKossQuery
         return $this;
     }
     
-    public function onDuplicateKey(array $values): KossUpdateQuery
+    public function onDuplicateKey(array $values): UpdateQuery
     {
         $compiled_values = '';
 
@@ -88,9 +88,9 @@ class KossUpdateQuery implements IKossQuery
         return $this;
     }
 
-    public function when(callable|bool $expression, callable $callback, callable $fallback = null): KossUpdateQuery
+    public function when(callable|bool $expression, callable $callback, callable $fallback = null): UpdateQuery
     {
-        KossUtil::when($this, $expression, $callback, $fallback);
+        Util::when($this, $expression, $callback, $fallback);
 
         return $this;
     }
@@ -120,7 +120,7 @@ class KossUpdateQuery implements IKossQuery
 
     public function build(): string
     {
-        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . KossUtil::assembleWhereClause($this->_where);
+        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Util::assembleWhereClause($this->_where);
         
         return $this->_query_built;
     }

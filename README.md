@@ -4,7 +4,7 @@
   - Allow `where()` to take arrays and nested arrays
   - Allow `where()` and `like()` to somehow use `OR` instead of always `AND`.
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
-  - Depending how advanced KossUpdateQuery gets, make KossInsertQuery to help seperate the internal code
+  - Depending how advanced UpdateQuery gets, make KossInsertQuery to help seperate the internal code
 
 ## Documentation
 
@@ -115,7 +115,7 @@ Functions which are not in Selection or Update/Insert queries
  
     // Get all columns in the "users" table, and when they're logged in, limit to only the first 5 rows.
     // Note the usage of new variable, $query in anonymous function. This will be passed by Koss.
-    $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn(KossSelectQuery $query) => $query->limit(5))->execute();
+    $results = $koss->getAll('users')->when(fn() => isset($_SESSION['logged_in']), fn(SelectQuery $query) => $query->limit(5))->execute();
     // MySQL Output: SELECT * FROM `users` LIMIT 5
 
     // Get the "username" column in the "users" table, but also select the "last_name" column.

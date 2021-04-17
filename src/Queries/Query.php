@@ -2,13 +2,13 @@
 
 namespace Aberdeener\Koss\Queries;
 
-interface IKossQuery
+interface Query
 {
 
     /**
      * Execute Koss function under certain conditions
      */
-    public function when(callable|bool $expression, callable $callback, callable $fallback = null): IKossQuery;
+    public function when(callable|bool $expression, callable $callback, ?callable $fallback = null): Query;
 
     /**
      * Execute repsective query and store result

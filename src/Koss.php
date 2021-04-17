@@ -4,8 +4,9 @@ namespace Aberdeener\Koss;
 
 use PDO;
 use PDOException;
-use Aberdeener\Koss\Queries\KossSelectQuery;
-use Aberdeener\Koss\Queries\KossUpdateQuery;
+use Aberdeener\Koss\Queries\SelectQuery;
+use Aberdeener\Koss\Queries\UpdateQuery;
+use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * 
@@ -51,9 +52,9 @@ class Koss
      * Get all columns in $table.
      * 
      * @param string $table Name of table to select all columns from.
-     * @return KossSelectQuery New instance of SelectQuery class
+     * @return SelectQuery New instance of SelectQuery class
      */
-    public function getAll(string $table): KossSelectQuery
+    public function getAll(string $table): SelectQuery
     {
         return $this->getSome($table, ['*']);
     }
@@ -63,15 +64,15 @@ class Koss
      * 
      * @param string $table Name of table to select from.
      * @param array|string $columns Name of single column, or array of column names to select.
-     * @return KossSelectQuery New instance of SelectQuery class
+     * @return SelectQuery New instance of SelectQuery class
      */
-    public function getSome(string $table, array|string $columns): KossSelectQuery
+    public function getSome(string $table, array|string $columns): SelectQuery
     {
         if (!is_array($columns)) {
             $columns = (array) $columns;
         }
 
-        $this->_query_instance = KossSelectQuery::get($this->_pdo, $table, $columns);
+        $this->_query_instance = SelectQuery::get($this->_pdo, $table, $columns);
 
         return $this->_query_instance;
     }
@@ -79,15 +80,15 @@ class Koss
     /**
      * Insert new row into a table.
      * Sets this instance's $_query_instance to new UpdateQuery class.
-     * Forwards to KossUpdateQuery to handle.
+     * Forwards to UpdateQuery to handle.
      * 
      * @param string $table Table to update.
      * @param array $row Column name/Value pairs to insert into table.
-     * @return KossUpdateQuery New instance of UpdateQuery class.
+     * @return UpdateQuery New instance of UpdateQuery class.
      */
-    public function insert(string $table, array $row): KossUpdateQuery
+    public function insert(string $table, array $row): UpdateQuery
     {
-        $this->_query_instance = KossUpdateQuery::insert($this->_pdo, $table, $row);
+        $this->_query_instance = UpdateQuery::insert($this->_pdo, $table, $row);
 
         return $this->_query_instance;
     }
@@ -97,11 +98,11 @@ class Koss
      * 
      * @param string $table Table to update.
      * @param array $values Values to update into table.
-     * @return KossUpdateQuery New instance of UpdateQuery class.
+     * @return UpdateQuery New instance of UpdateQuery class.
      */
-    public function update(string $table, array $values): KossUpdateQuery
+    public function update(string $table, array $values): UpdateQuery
     {
-        $this->_query_instance = KossUpdateQuery::update($this->_pdo, $table, $values);
+        $this->_query_instance = UpdateQuery::update($this->_pdo, $table, $values);
         
         return $this->_query_instance;
     }
@@ -118,16 +119,16 @@ class Koss
 
         switch ($token) {
             case "SELECT":
-                return (new KossSelectQuery($this->_pdo, [], $query))->execute();
+                return (new SelectQuery($this->_pdo, [], $query))->execute();
                 break;
 
             case "INSERT":
             case "UPDATE":
-                return (new KossUpdateQuery($this->_pdo, $query))->execute();
+                return (new UpdateQuery($this->_pdo, $query))->execute();
                 break;
 
             default:
-                throw new PDOException("Unsupported start of MySQL query string. Token: $token.");
+                throw new StatementException("Unsupported start of MySQL query string. Token: $token.");
                 break;
         }
     }

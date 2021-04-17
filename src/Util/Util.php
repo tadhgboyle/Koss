@@ -2,21 +2,21 @@
 
 namespace Aberdeener\Koss\Util;
 
-use PDOException;
-use Aberdeener\Koss\Queries\IKossQuery;
+use Aberdeener\Koss\Queries\Query;
+use Aberdeener\Koss\Exceptions\StatementException;
 
-class KossUtil
+class Util
 {
 
     /**
      * Run a Koss function only when the specified $expression is true.
      * 
-     * @param IKossQuery $instance Current instance of Select/Update query to pass in background to callable function.
+     * @param Query $instance Current instance of Select/Update query to pass in background to callable function.
      * @param callable|bool $expression Expression to run, must return bool
      * @param callable $callback Ran if $expression is true
      * @param callable $fallback (optional) Ran if $expression is false
      */
-    public static function when(IKossQuery $instance, callable|bool $expression, callable $callback, callable $fallback = null): void
+    public static function when(Query $instance, callable|bool $expression, callable $callback, callable $fallback = null): void
     {
         $expression_bool = is_callable($expression) ? $expression() : $expression;
 
@@ -48,7 +48,7 @@ class KossUtil
         }
 
         if (!in_array($operator, ['=', '<>', 'LIKE'])) {
-            throw new PDOException("Unsupported WHERE clause operator. Operator: $operator.");
+            throw new StatementException("Unsupported WHERE clause operator. Operator: $operator.");
         }
 
         return [
@@ -56,6 +56,23 @@ class KossUtil
             'operator' => $operator,
             'matches' => $matches
         ];
+    }
+    
+    /**
+     * Create string of joint JOIN clauses for use in final query.
+     *
+     * @param array $joins Raw JOIN statements
+     * @return string Joint statements.
+     */
+    public static function assembleJoinClause(array $joins): string
+    {
+        $clause = '';
+
+        foreach ($joins as $join) {
+            $clause .= $join . ' ';
+        }
+
+        return $clause;
     }
 
     /**
