@@ -13,6 +13,7 @@ class Join
 
     protected string $_keyword;
     protected string $_table;
+    protected string $_through;
     protected string $_foreign_id;
     protected string $_local_id;
     protected string $_join_built;
@@ -40,12 +41,26 @@ class Join
 
         return $this;
     }
+    
+    /**
+     * Set table to use for finding matches.
+     * If not set, will use table in parent SelectQuery instance.
+     *
+     * @param string $through Name of table to use for lookup.
+     * @return Join This instance of join class.
+     */
+    public function through(string $through): Join
+    {
+        $this->_through = $through;
+
+        return $this;
+    }
 
     /**
      * Set which columns to preform the ON operation on.
      *
      * @param string $foreign_id Name of column in $_table to use for lookup.
-     * @param string|null $local_id Name of column to use in this table for lookup. If not provided, will attempt to use same column name as $foreign_id/
+     * @param string|null $local_id Name of column to use in this table for lookup. If not provided, will attempt to use same column name as $foreign_id.
      */
     public function on(string $foreign_id, ?string $local_id = null): void
     {
@@ -74,13 +89,19 @@ class Join
      */
     private function build(): string
     {
-        $class = new ReflectionClass(SelectQuery::class);
-        $table_prop = $class->getProperty('_table');
-        $table_prop->setAccessible(true);
-        $table = $table_prop->getValue($this->_query_instance);
-        $table_prop->setAccessible(false);
+        if (!isset($this->_through)) {
+            $class = new ReflectionClass(SelectQuery::class);
+            $table_prop = $class->getProperty('_table');
+            $table_prop->setAccessible(true);
 
-        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . Util::escapeStrings($this->_table) . '.' . Util::escapeStrings($this->_foreign_id) . ' = ' . Util::escapeStrings($table) . '.' . Util::escapeStrings($this->_local_id);
+            $through = $table_prop->getValue($this->_query_instance);
+
+            $table_prop->setAccessible(false);
+        } else {
+            $through = $this->_through;
+        }
+
+        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . Util::escapeStrings($this->_table) . '.' . Util::escapeStrings($this->_foreign_id) . ' = ' . Util::escapeStrings($through) . '.' . Util::escapeStrings($this->_local_id);
     }
 
     /**
