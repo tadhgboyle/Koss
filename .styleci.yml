@@ -1,5 +1,17 @@
 risky: false
 version: 8
-preset: psr12
+preset: recommended
 tab-width: 4
 use-tabs: false
+disabled:
+- alpha_ordered_imports
+- concat_without_spaces
+- phpdoc_align
+- align_phpdoc
+- die_to_exit
+- no_blank_lines_after_class_opening
+- no_blank_lines_after_throw
+enabled:
+- length_ordered_imports
+- concat_with_spaces
+- method_separation
