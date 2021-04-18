@@ -11,6 +11,9 @@ disabled:
 - die_to_exit
 - no_blank_lines_after_class_opening
 - no_blank_lines_after_throw
+- elseif
+- align_double_arrow
 enabled:
 - length_ordered_imports
 - concat_with_spaces
+- nullable_type_declarations
