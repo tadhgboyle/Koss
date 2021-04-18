@@ -1,0 +1,5 @@
+risky: false
+version: 8
+preset: recommended
+tab-width: 4
+use-tabs: false
