@@ -22,7 +22,6 @@ class Util
         if ($expression_bool) {
             $callback($instance);
             return;
-            
         } else {
             if ($fallback != null) {
                 $fallback($instance);
