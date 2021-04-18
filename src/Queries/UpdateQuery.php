@@ -6,11 +6,9 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
-use Aberdeener\Koss\Queries\Query;
 
 class UpdateQuery implements Query
 {
-    
     protected PDO $_pdo;
     protected PDOStatement $_query;
 
@@ -18,13 +16,13 @@ class UpdateQuery implements Query
     protected string $_query_where = '';
     protected string $_query_duplicate_key = '';
     protected string $_query_built = '';
-    protected array $_where = array();
-    
+    protected array $_where = [];
+
     /**
      * Create new instance of UpdateQuery. Should only be used internally by Koss.
      *
      * @param PDO $pdo PDO connection to be used.
-     * @param string $query 
+     * @param string $query
      */
     public function __construct(PDO $pdo, string $query)
     {
@@ -34,10 +32,11 @@ class UpdateQuery implements Query
 
     /**
      * Insert new row into a table.
-     * 
+     *
      * @param PDO $pdo PDO instance to be used.
      * @param string $table Table to update.
      * @param array $row Column name/Value pairs to insert into table.
+     *
      * @return UpdateQuery New instance of UpdateQuery class.
      */
     public static function insert(PDO $pdo, string $table, array $row): UpdateQuery
@@ -61,17 +60,17 @@ class UpdateQuery implements Query
         return new UpdateQuery($pdo, "UPDATE `$table` SET $values_compiled");
     }
 
-    public function where(string $column, string $operator, string $matches = null): UpdateQuery
+    public function where(string $column, string $operator, ?string $matches = null): UpdateQuery
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
         if ($append != null) {
             $this->_where[] = $append;
         }
-        
+
         return $this;
     }
-    
+
     public function onDuplicateKey(array $values): UpdateQuery
     {
         $compiled_values = '';
@@ -85,7 +84,7 @@ class UpdateQuery implements Query
         return $this;
     }
 
-    public function when(callable|bool $expression, callable $callback, callable $fallback = null): UpdateQuery
+    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): UpdateQuery
     {
         Util::when($this, $expression, $callback, $fallback);
 
@@ -96,19 +95,16 @@ class UpdateQuery implements Query
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
             if ($this->_query->execute()) {
-                
                 try {
-
                     $this->_result = $this->_query->rowCount();
                     $this->reset();
 
                     return $this->_result;
-
                 } catch (PDOException $e) {
                     die($e->getMessage());
                 }
             }
-            
+
             die(print_r($this->_pdo->errorInfo()));
         }
 
@@ -118,13 +114,13 @@ class UpdateQuery implements Query
     public function build(): string
     {
         $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Util::assembleWhereClause($this->_where);
-        
+
         return $this->_query_built;
     }
-    
+
     public function reset(): void
     {
-        $this->_where = array();
+        $this->_where = [];
         $this->_query_built = $this->_query_insert = $this->_query_duplicate_key = '';
     }
 

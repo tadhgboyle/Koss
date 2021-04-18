@@ -9,7 +9,6 @@ use Aberdeener\Koss\Exceptions\JoinException;
 
 class Join
 {
-
     protected SelectQuery $_query_instance;
 
     protected string $_keyword;
@@ -32,6 +31,7 @@ class Join
      * Set table to preform this JOIN clause on.
      *
      * @param string $table Name of table to use.
+     *
      * @return Join This instance of join class.
      */
     public function table(string $table): Join
