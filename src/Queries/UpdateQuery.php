@@ -30,36 +30,6 @@ class UpdateQuery extends Query
         $this->_query_insert = $query;
     }
 
-    /**
-     * Insert new row into a table.
-     *
-     * @param PDO $pdo PDO instance to be used.
-     * @param string $table Table to update.
-     * @param array $row Column name/Value pairs to insert into table.
-     *
-     * @return UpdateQuery New instance of UpdateQuery class.
-     */
-    public static function insert(PDO $pdo, string $table, array $row): UpdateQuery
-    {
-        $columns = implode(', ', Util::escapeStrings(array_keys($row)));
-        $values = implode(', ', Util::escapeStrings(array_values($row), '\''));
-
-        return new UpdateQuery($pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
-    }
-
-    public static function update(PDO $pdo, string $table, array $values): UpdateQuery
-    {
-        $values_compiled = '';
-
-        foreach ($values as $column => $value) {
-            $values_compiled .= "`$column` = '$value', ";
-        }
-
-        $values_compiled = rtrim($values_compiled, ',');
-
-        return new UpdateQuery($pdo, "UPDATE `$table` SET $values_compiled");
-    }
-
     public function where(string $column, string $operator, ?string $matches = null): UpdateQuery
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);

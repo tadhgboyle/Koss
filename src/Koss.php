@@ -4,6 +4,7 @@ namespace Aberdeener\Koss;
 
 use PDO;
 use PDOException;
+use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Queries\UpdateQuery;
@@ -70,7 +71,9 @@ class Koss
             $columns = (array) $columns;
         }
 
-        $this->_query_instance = SelectQuery::get($this->_pdo, $table, $columns);
+        $csv_columns = implode(', ', in_array('*', $columns) ? ['*'] : Util::escapeStrings($columns));
+
+        $this->_query_instance = new SelectQuery($this->_pdo, $columns, "SELECT $csv_columns", "FROM `$table`", $table);
 
         return $this->_query_instance;
     }
@@ -87,7 +90,10 @@ class Koss
      */
     public function insert(string $table, array $row): UpdateQuery
     {
-        $this->_query_instance = UpdateQuery::insert($this->_pdo, $table, $row);
+        $columns = implode(', ', Util::escapeStrings(array_keys($row)));
+        $values = implode(', ', Util::escapeStrings(array_values($row), '\''));
+
+        $this->_query_instance =  new UpdateQuery($this->_pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
 
         return $this->_query_instance;
     }
@@ -102,7 +108,15 @@ class Koss
      */
     public function update(string $table, array $values): UpdateQuery
     {
-        $this->_query_instance = UpdateQuery::update($this->_pdo, $table, $values);
+        $values_compiled = '';
+
+        foreach ($values as $column => $value) {
+            $values_compiled .= "`$column` = '$value', ";
+        }
+
+        $values_compiled = rtrim($values_compiled, ',');
+
+        $this->_query_instance =  new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
 
         return $this->_query_instance;
     }

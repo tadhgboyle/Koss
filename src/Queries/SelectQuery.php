@@ -40,14 +40,7 @@ class SelectQuery extends Query
             $this->_table = $table;
         }
     }
-
-    public static function get(PDO $pdo, string $table, array $columns): SelectQuery
-    {
-        $new_columns = implode(', ', ($columns[0] != '*') ? Util::escapeStrings($columns) : $columns);
-
-        return new SelectQuery($pdo, $columns, "SELECT $new_columns", "FROM `$table`", $table);
-    }
-
+    
     public function columns(array $columns): SelectQuery
     {
         $new_columns = [];

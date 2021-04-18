@@ -1,10 +1,12 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
+  - Make chained join clauses more fluent, after `on()` add a `then($callback)` ?
   - Allow `where()` to take arrays and nested arrays
   - Allow `where()` and `like()` to somehow use `OR` instead of always `AND`.
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
-  - Depending how advanced UpdateQuery gets, make KossInsertQuery to help seperate the internal code
+  - Depending how advanced UpdateQuery gets, make InsertQuery to help seperate the internal code
+  - Add simple `cast()` functionality (to bool, int, float, etc. Or even custom models which would impl KossCast or something)
 
 ## Documentation
 
