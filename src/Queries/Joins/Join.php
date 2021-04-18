@@ -19,7 +19,7 @@ class Join
 
     public function __construct(string $keyword, SelectQuery $query_instance)
     {
-        if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER', 'FULL OUTER'])) {
+        if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER'])) {
             throw new JoinException("Invalid JOIN clause keyword. Keyword: $keyword");
         }
 
@@ -49,7 +49,7 @@ class Join
      */
     public function on(string $foreign_id, ?string $local_id = null): void
     {
-        if ($this->_table == null) {
+        if (!isset($this->_table)) {
             throw new JoinException('$_table must be set before running on() function.');
         }
 
@@ -80,7 +80,7 @@ class Join
         $table = $table_prop->getValue($this->_query_instance);
         $table_prop->setAccessible(false);
 
-        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . $this->_table . '.' . $this->_foreign_id . ' = ' . $table . '.' . $this->_local_id;
+        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . Util::escapeStrings($this->_table) . '.' . Util::escapeStrings($this->_foreign_id) . ' = ' . Util::escapeStrings($table) . '.' . Util::escapeStrings($this->_local_id);
     }
 
     /**

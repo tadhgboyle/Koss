@@ -7,7 +7,6 @@ use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
-use Aberdeener\Koss\Queries\Joins\FullOuterJoin;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
 use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 
@@ -122,20 +121,6 @@ class SelectQuery extends Query
     public function rightOuterJoin(callable $callback): SelectQuery
     {
         $callback(new RightOuterJoin($this));
-
-        return $this;
-    }
-
-    /**
-     * Preform a FULL OUTER JOIN on this select statement.
-     *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
-     *
-     * @return SelectQuery This instance of SelectQuery.
-     */
-    public function fullOuterJoin(callable $callback): SelectQuery
-    {
-        $callback(new FullOuterJoin($this));
 
         return $this;
     }
