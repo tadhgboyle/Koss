@@ -13,6 +13,7 @@ disabled:
 - no_blank_lines_after_throw
 - elseif
 - align_double_arrow
+- blank_line_before_return
 enabled:
 - length_ordered_imports
 - concat_with_spaces

@@ -7,7 +7,7 @@ use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 
-class UpdateQuery implements Query
+class UpdateQuery extends Query
 {
     protected PDO $_pdo;
     protected PDOStatement $_query;
@@ -122,15 +122,5 @@ class UpdateQuery implements Query
     {
         $this->_where = [];
         $this->_query_built = $this->_query_insert = $this->_query_duplicate_key = '';
-    }
-
-    public function toString(): string
-    {
-        return $this->build();
-    }
-
-    public function __toString(): string
-    {
-        return $this->build();
     }
 }

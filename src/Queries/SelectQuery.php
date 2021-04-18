@@ -11,7 +11,7 @@ use Aberdeener\Koss\Queries\Joins\FullOuterJoin;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
 use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 
-class SelectQuery implements Query
+class SelectQuery extends Query
 {
     protected PDO $_pdo;
     protected PDOStatement $_query;
@@ -82,19 +82,6 @@ class SelectQuery implements Query
         }
 
         return $this;
-    }
-
-    /**
-     * Preform an INNER JOIN on this select statement.
-     * Reroutes to `innerJoin()` as per default MySQL behaviour.
-     *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
-     *
-     * @return SelectQuery This instance of SelectQuery.
-     */
-    public function join(callable $callback): SelectQuery
-    {
-        return $this->innerJoin($callback);
     }
 
     /**
@@ -226,15 +213,5 @@ class SelectQuery implements Query
     {
         $this->_where = $this->_selected_columns = [];
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
-    }
-
-    public function toString(): string
-    {
-        return $this->build();
-    }
-
-    public function __toString(): string
-    {
-        return $this->build();
     }
 }
