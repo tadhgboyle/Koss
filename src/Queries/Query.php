@@ -7,27 +7,27 @@ abstract class Query
     /**
      * Execute Koss function under certain conditions.
      */
-    public abstract function when(callable | bool $expression, callable $callback, ?callable $fallback = null): Query;
+    abstract public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): Query;
 
     /**
      * Execute repsective query and store result.
      */
-    public abstract function execute(): mixed;
+    abstract public function execute(): mixed;
 
     /**
      * Assemble queries into MySQL statement.
      */
-    public abstract function build(): string;
+    abstract public function build(): string;
 
     /**
      * Reset query strings.
      */
-    public abstract function reset(): void;
+    abstract public function reset(): void;
 
     /**
      * Debugging only: Output the built string of all queries so far.
      */
-    public final function toString(): string
+    final public function toString(): string
     {
         return $this->build();
     }
@@ -35,7 +35,7 @@ abstract class Query
     /**
      * Debugging only: Output the built string of all queries so far.
      */
-    public final function __toString(): string
+    final public function __toString(): string
     {
         return $this->build();
     }
