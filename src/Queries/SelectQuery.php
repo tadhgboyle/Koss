@@ -6,7 +6,6 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
-use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
 use Aberdeener\Koss\Queries\Joins\FullOuterJoin;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
@@ -14,7 +13,6 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 
 class SelectQuery implements Query
 {
-
     protected PDO $_pdo;
     protected PDOStatement $_query;
 
@@ -25,11 +23,11 @@ class SelectQuery implements Query
     protected string $_query_order_by = '';
     protected string $_query_limit = '';
     protected string $_query_built = '';
-    protected array $_where = array();
-    protected array $_joins = array();
-    protected array $_selected_columns = array();
+    protected array $_where = [];
+    protected array $_joins = [];
+    protected array $_selected_columns = [];
 
-    public function __construct(PDO $pdo, array $columns, string $query_select, string $query_from = null, string $table = null)
+    public function __construct(PDO $pdo, array $columns, string $query_select, ?string $query_from = null, ?string $table = null)
     {
         $this->_pdo = $pdo;
         $this->_selected_columns = $columns;
@@ -45,7 +43,7 @@ class SelectQuery implements Query
     }
 
     public static function get(PDO $pdo, string $table, array $columns): SelectQuery
-    {        
+    {
         $new_columns = implode(', ', ($columns[0] != '*') ? Util::escapeStrings($columns) : $columns);
 
         return new SelectQuery($pdo, $columns, "SELECT $new_columns", "FROM `$table`", $table);
@@ -53,7 +51,7 @@ class SelectQuery implements Query
 
     public function columns(array $columns): SelectQuery
     {
-        $new_columns = array();
+        $new_columns = [];
 
         foreach ($columns as $column) {
             if (!in_array($column, $this->_selected_columns)) {
@@ -70,12 +68,12 @@ class SelectQuery implements Query
         return $this;
     }
 
-    public function column(string $column): SelectQuery 
+    public function column(string $column): SelectQuery
     {
         return $this->columns([$column]);
     }
 
-    public function where(string $column, string $operator, string $matches = null): SelectQuery
+    public function where(string $column, string $operator, ?string $matches = null): SelectQuery
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
@@ -85,12 +83,13 @@ class SelectQuery implements Query
 
         return $this;
     }
-    
+
     /**
      * Preform an INNER JOIN on this select statement.
      * Reroutes to `innerJoin()` as per default MySQL behaviour.
      *
      * @param callable $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function join(callable $callback): SelectQuery
@@ -102,6 +101,7 @@ class SelectQuery implements Query
      * Preform an INNER JOIN on this select statement.
      *
      * @param callable $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function innerJoin(callable $callback): SelectQuery
@@ -115,12 +115,13 @@ class SelectQuery implements Query
      * Preform a LEFT OUTER JOIN on this select statement.
      *
      * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function leftOuterJoin(callable $callback): SelectQuery
     {
         $callback(new LeftOuterJoin($this));
-        
+
         return $this;
     }
 
@@ -128,6 +129,7 @@ class SelectQuery implements Query
      * Preform a RIGHT OUTER JOIN on this select statement.
      *
      * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function rightOuterJoin(callable $callback): SelectQuery
@@ -141,6 +143,7 @@ class SelectQuery implements Query
      * Preform a FULL OUTER JOIN on this select statement.
      *
      * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function fullOuterJoin(callable $callback): SelectQuery
@@ -156,6 +159,7 @@ class SelectQuery implements Query
      *
      * @param string $column Column name to search in.
      * @param string $like Value to attempt to find. Must provide `"%"` as needed.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function like(string $column, string $like): SelectQuery
@@ -166,22 +170,25 @@ class SelectQuery implements Query
     public function groupBy(string $column): SelectQuery
     {
         $this->_query_group_by = "GROUP BY `$column`";
+
         return $this;
     }
 
     public function orderBy(string $column, string $order): SelectQuery
     {
         $this->_query_order_by = "ORDER BY `$column` $order";
+
         return $this;
     }
 
     public function limit(int $limit): SelectQuery
     {
         $this->_query_limit = "LIMIT $limit";
+
         return $this;
     }
 
-    public function when(callable|bool $expression, callable $callback, callable $fallback = null): SelectQuery
+    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): SelectQuery
     {
         Util::when($this, $expression, $callback, $fallback);
 
@@ -192,18 +199,14 @@ class SelectQuery implements Query
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
             if ($this->_query->execute()) {
-
                 try {
-
                     $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
                     $this->reset();
 
                     return $this->_result;
-
                 } catch (PDOException $e) {
                     die($e->getMessage());
                 }
-
             } else {
                 die(print_r($this->_pdo->errorInfo()));
             }
@@ -215,12 +218,13 @@ class SelectQuery implements Query
     public function build(): string
     {
         $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+
         return $this->_query_built;
     }
 
     public function reset(): void
     {
-        $this->_where = $this->_selected_columns = array();
+        $this->_where = $this->_selected_columns = [];
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 
