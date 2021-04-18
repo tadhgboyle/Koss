@@ -14,4 +14,3 @@ disabled:
 enabled:
 - length_ordered_imports
 - concat_with_spaces
-- method_separation
