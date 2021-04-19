@@ -37,10 +37,11 @@ class Util
      * @param string $column Name of column to use in clause.
      * @param string $operator Operator to use in comparison.
      * @param string|null $matches Value to match with. If not provided, operator will be assumed as `=` and $operator will be used as match.
-     *
+     * @param string|null $glue How to join this clause with other WHERE clauses. Can be `AND` or `OR`.
+     * 
      * @return array Validated and prepared array.
      */
-    public static function handleWhereOperation(string $column, string $operator, ?string $matches = null): array
+    public static function handleWhereOperation(string $column, string $operator, ?string $matches = null, ?string $glue = 'AND'): array
     {
         if ($matches == null) {
             $matches = $operator;
@@ -48,13 +49,18 @@ class Util
         }
 
         if (!in_array($operator, ['=', '<>', 'LIKE'])) {
-            throw new StatementException("Unsupported WHERE clause operator. Operator: $operator.");
+            throw new StatementException("Invalid WHERE clause operator. Operator: $operator.");
+        }
+
+        if (!in_array($glue, ['AND', 'OR'])) {
+            throw new StatementException("Invalid WHERE clause glue. Glue: $glue.");
         }
 
         return [
+            'glue' => $glue,
             'column' => $column,
             'operator' => $operator,
-            'matches' => $matches,
+            'matches' => $matches
         ];
     }
 
@@ -93,7 +99,7 @@ class Util
                 $return .= 'WHERE ';
                 $first = false;
             } else {
-                $return .= 'AND '; // TODO: Allow changing to `OR`
+                $return .= $clause['glue'] . ' ';
             }
 
             $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';

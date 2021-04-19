@@ -10,7 +10,7 @@ abstract class Query
     protected array $_where = [];
 
     /**
-     * Preform a WHERE operation in this query.
+     * Preform an AND WHERE operation in this query.
      *
      * @param string $column Name of column to use.
      * @param string $operator Operator to use for comparison.
@@ -21,6 +21,26 @@ abstract class Query
     public function where(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
+
+        if ($append != null) {
+            $this->_where[] = $append;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Preform an OR WHERE operation in this query.
+     *
+     * @param string $column Name of column to use.
+     * @param string $operator Operator to use for comparison.
+     * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
+     * 
+     * @return SelectQuery|UpdateQuery This instance of Query.
+     */
+    public function orWhere(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
+    {
+        $append = Util::handleWhereOperation($column, $operator, $matches, 'OR');
 
         if ($append != null) {
             $this->_where[] = $append;
