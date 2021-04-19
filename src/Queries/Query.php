@@ -6,7 +6,6 @@ use Aberdeener\Koss\Util\Util;
 
 abstract class Query
 {
-
     protected array $_where = [];
 
     /**
@@ -15,7 +14,7 @@ abstract class Query
      * @param string $column Name of column to use.
      * @param string $operator Operator to use for comparison.
      * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
-     * 
+     *
      * @return SelectQuery|UpdateQuery This instance of Query.
      */
     public function where(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
@@ -35,7 +34,7 @@ abstract class Query
      * @param string $column Name of column to use.
      * @param string $operator Operator to use for comparison.
      * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
-     * 
+     *
      * @return SelectQuery|UpdateQuery This instance of Query.
      */
     public function orWhere(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
@@ -52,10 +51,10 @@ abstract class Query
     /**
      * Execute Koss function under certain conditions.
      *
-     * @param callable|bool $expression Function or boolean value to eval. 
+     * @param callable|bool $expression Function or boolean value to eval.
      * @param callable $callback Function to run when $expression is true.
      * @param callable|null $fallback Function to run when $expression is false.
-     * 
+     *
      * @return SelectQuery|UpdateQuery This instance of Query.
      */
     public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): SelectQuery | UpdateQuery

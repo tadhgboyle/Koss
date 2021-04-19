@@ -33,7 +33,7 @@ class UpdateQuery extends Query
      * Key/Value array of column/value to insert if a duplicate key is found during this update query.
      *
      * @param array $values Key => Value array of row to update if duplicate key is found.
-     * 
+     *
      * @return UpdateQuery This instance of UpdateQuery.
      */
     public function onDuplicateKey(array $values): UpdateQuery
