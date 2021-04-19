@@ -16,7 +16,6 @@ class UpdateQuery extends Query
     protected string $_query_where = '';
     protected string $_query_duplicate_key = '';
     protected string $_query_built = '';
-    protected array $_where = [];
 
     /**
      * Create new instance of UpdateQuery. Should only be used internally by Koss.
@@ -30,17 +29,12 @@ class UpdateQuery extends Query
         $this->_query_insert = $query;
     }
 
-    public function where(string $column, string $operator, ?string $matches = null): UpdateQuery
-    {
-        $append = Util::handleWhereOperation($column, $operator, $matches);
-
-        if ($append != null) {
-            $this->_where[] = $append;
-        }
-
-        return $this;
-    }
-
+    /**
+     * Key/Value array of column/value to insert if a duplicate key is found during this update query.
+     *
+     * @param  mixed $values
+     * @return UpdateQuery
+     */
     public function onDuplicateKey(array $values): UpdateQuery
     {
         $compiled_values = '';
@@ -50,13 +44,6 @@ class UpdateQuery extends Query
         }
 
         $this->_query_duplicate_key = "ON DUPLICATE KEY UPDATE $compiled_values";
-
-        return $this;
-    }
-
-    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): UpdateQuery
-    {
-        Util::when($this, $expression, $callback, $fallback);
 
         return $this;
     }

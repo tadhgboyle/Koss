@@ -91,9 +91,9 @@ class Koss
     public function insert(string $table, array $row): UpdateQuery
     {
         $columns = implode(', ', Util::escapeStrings(array_keys($row)));
-        $values = implode(', ', Util::escapeStrings(array_values($row), '\''));
+        $values = implode(', ', Util::escapeStrings(array_values($row), "'"));
 
-        $this->_query_instance =  new UpdateQuery($this->_pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
+        $this->_query_instance = new UpdateQuery($this->_pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
 
         return $this->_query_instance;
     }
@@ -116,7 +116,7 @@ class Koss
 
         $values_compiled = rtrim($values_compiled, ',');
 
-        $this->_query_instance =  new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
+        $this->_query_instance = new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
 
         return $this->_query_instance;
     }

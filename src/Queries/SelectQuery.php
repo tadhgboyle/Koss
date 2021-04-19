@@ -22,7 +22,6 @@ class SelectQuery extends Query
     protected string $_query_order_by = '';
     protected string $_query_limit = '';
     protected string $_query_built = '';
-    protected array $_where = [];
     protected array $_joins = [];
     protected array $_selected_columns = [];
 
@@ -41,6 +40,13 @@ class SelectQuery extends Query
         }
     }
     
+    /**
+     * Add columns to SELECT clause.
+     *
+     * @param array $columns Names of columns to select.
+     * 
+     * @return SelectQuery This instance of SelectQuery.
+     */
     public function columns(array $columns): SelectQuery
     {
         $new_columns = [];
@@ -60,20 +66,16 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Add a single column to the SELECT clause.
+     *
+     * @param string $column Name of column.
+     * 
+     * @return SelectQuery This instance of SelectQuery.
+     */
     public function column(string $column): SelectQuery
     {
         return $this->columns([$column]);
-    }
-
-    public function where(string $column, string $operator, ?string $matches = null): SelectQuery
-    {
-        $append = Util::handleWhereOperation($column, $operator, $matches);
-
-        if ($append != null) {
-            $this->_where[] = $append;
-        }
-
-        return $this;
     }
 
     /**
@@ -149,13 +151,6 @@ class SelectQuery extends Query
     public function limit(int $limit): SelectQuery
     {
         $this->_query_limit = "LIMIT $limit";
-
-        return $this;
-    }
-
-    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): SelectQuery
-    {
-        Util::when($this, $expression, $callback, $fallback);
 
         return $this;
     }
