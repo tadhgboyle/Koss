@@ -3,6 +3,7 @@
 namespace Aberdeener\Koss\Queries\Joins;
 
 use ReflectionClass;
+use ReflectionProperty;
 use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Exceptions\JoinException;
@@ -18,6 +19,10 @@ class Join
     protected string $_local_id;
     protected string $_join_built;
 
+    protected static ReflectionClass $select_query_class;
+    protected static ReflectionProperty $table_property;
+    protected static ReflectionProperty $joins_property;
+
     public function __construct(string $keyword, SelectQuery $query_instance)
     {
         if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER'])) {
@@ -26,6 +31,10 @@ class Join
 
         $this->_keyword = $keyword;
         $this->_query_instance = $query_instance;
+
+        self::$select_query_class = new ReflectionClass(SelectQuery::class);
+        self::$table_property = self::$select_query_class->getProperty('_table');
+        self::$joins_property = self::$select_query_class->getProperty('_joins');
     }
 
     /**
@@ -72,15 +81,13 @@ class Join
         $this->_foreign_id = $foreign_id;
         $this->_local_id = $local_id ?? $foreign_id;
 
-        $class = new ReflectionClass(SelectQuery::class);
-        $joins_prop = $class->getProperty('_joins');
-        $joins_prop->setAccessible(true);
+        self::$joins_property->setAccessible(true);
 
-        $joins_array = $joins_prop->getValue($this->_query_instance);
+        $joins_array = self::$joins_property->getValue($this->_query_instance);
         $joins_array[] = $this->build();
 
-        $joins_prop->setValue($this->_query_instance, $joins_array);
-        $joins_prop->setAccessible(false);
+        self::$joins_property->setValue($this->_query_instance, $joins_array);
+        self::$joins_property->setAccessible(false);
     }
 
     /**
@@ -91,13 +98,11 @@ class Join
     private function build(): string
     {
         if (!isset($this->_through)) {
-            $class = new ReflectionClass(SelectQuery::class);
-            $table_prop = $class->getProperty('_table');
-            $table_prop->setAccessible(true);
+            self::$table_property->setAccessible(true);
 
-            $through = $table_prop->getValue($this->_query_instance);
+            $through = self::$table_property->getValue($this->_query_instance);
 
-            $table_prop->setAccessible(false);
+            self::$table_property->setAccessible(false);
         } else {
             $through = $this->_through;
         }
@@ -106,7 +111,7 @@ class Join
     }
 
     /**
-     * Create query for this JOIN clause.
+     * Print query for this JOIN clause.
      * Forwards request to `build()` function.
      *
      * @return string Built query.

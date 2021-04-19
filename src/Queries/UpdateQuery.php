@@ -21,7 +21,7 @@ class UpdateQuery extends Query
      * Create new instance of UpdateQuery. Should only be used internally by Koss.
      *
      * @param PDO $pdo PDO connection to be used.
-     * @param string $query
+     * @param string $query Query string to start with.
      */
     public function __construct(PDO $pdo, string $query)
     {
@@ -32,8 +32,9 @@ class UpdateQuery extends Query
     /**
      * Key/Value array of column/value to insert if a duplicate key is found during this update query.
      *
-     * @param  mixed $values
-     * @return UpdateQuery
+     * @param array $values Key => Value array of row to update if duplicate key is found.
+     * 
+     * @return UpdateQuery This instance of UpdateQuery.
      */
     public function onDuplicateKey(array $values): UpdateQuery
     {

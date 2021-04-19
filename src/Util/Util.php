@@ -73,7 +73,7 @@ class Util
             $clause .= $join . ' ';
         }
 
-        return $clause;
+        return trim($clause);
     }
 
     /**
@@ -99,7 +99,7 @@ class Util
             $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
         }
 
-        return $return;
+        return trim($return);
     }
 
     /**

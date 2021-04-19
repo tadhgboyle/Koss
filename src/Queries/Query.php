@@ -16,9 +16,9 @@ abstract class Query
      * @param string $operator Operator to use for comparison.
      * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
      * 
-     * @return Query This instance of Query.
+     * @return SelectQuery|UpdateQuery This instance of Query.
      */
-    public function where(string $column, string $operator, ?string $matches = null): Query
+    public function where(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
@@ -36,9 +36,9 @@ abstract class Query
      * @param callable $callback Function to run when $expression is true.
      * @param callable|null $fallback Function to run when $expression is false.
      * 
-     * @return Query This instance of Query.
+     * @return SelectQuery|UpdateQuery This instance of Query.
      */
-    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): Query
+    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): SelectQuery | UpdateQuery
     {
         Util::when($this, $expression, $callback, $fallback);
 
@@ -48,20 +48,20 @@ abstract class Query
     /**
      * Execute repsective query and store result.
      */
-    abstract public function execute(): mixed;
+    abstract public function execute(): array | int;
 
     /**
-     * Assemble queries into MySQL statement.
+     * Assemble clauses into matching MySQL statement.
      */
     abstract public function build(): string;
 
     /**
-     * Reset query strings.
+     * Reset query strings and arrays.
      */
     abstract public function reset(): void;
 
     /**
-     * Debugging only: Output the built string of all queries so far.
+     * Output the built string of all queries so far.
      */
     final public function toString(): string
     {
@@ -69,7 +69,7 @@ abstract class Query
     }
 
     /**
-     * Debugging only: Output the built string of all queries so far.
+     * Output the built string of all queries so far.
      */
     final public function __toString(): string
     {

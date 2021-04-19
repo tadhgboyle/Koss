@@ -25,6 +25,15 @@ class SelectQuery extends Query
     protected array $_joins = [];
     protected array $_selected_columns = [];
 
+    /**
+     * Create a new instance of SelectQuery.
+     *
+     * @param PDO $pdo Instance of PDO to use for actual querying.
+     * @param array $columns Array of column names to use in SELECT clause, used for detecting duplicates from compiled statement.
+     * @param string $query_select Valid MySQL statement to use for start of SELECT clause.
+     * @param string|null $query_from If provided, this will be the base for the FROM clause. Generated and provided automatically by Koss in the `getAll()` or `getSome()` functions.
+     * @param string $table Name of table to use for primary SELECT statement. This is used to pass into Join objects if needed.
+     */
     public function __construct(PDO $pdo, array $columns, string $query_select, ?string $query_from = null, ?string $table = null)
     {
         $this->_pdo = $pdo;
@@ -39,7 +48,7 @@ class SelectQuery extends Query
             $this->_table = $table;
         }
     }
-    
+
     /**
      * Add columns to SELECT clause.
      *
@@ -134,6 +143,13 @@ class SelectQuery extends Query
         return $this->where($column, 'LIKE', $like);
     }
 
+    /**
+     * Add a GROUP BY statement to this query.
+     *
+     * @param string $column Name of column to group by.
+     * 
+     * @return SelectQuery This instance of SelectQuery.
+     */
     public function groupBy(string $column): SelectQuery
     {
         $this->_query_group_by = "GROUP BY `$column`";
@@ -141,13 +157,28 @@ class SelectQuery extends Query
         return $this;
     }
 
-    public function orderBy(string $column, string $order): SelectQuery
+    /**
+     * Add an ORDER BY statement to this query.
+     *
+     * @param string $column Column name to sort results by.
+     * @param string|null $order Order to sort by. Can be `DESC` or `ASC`. Defaults to `DESC`.
+     * 
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function orderBy(string $column, string $order = 'DESC'): SelectQuery
     {
         $this->_query_order_by = "ORDER BY `$column` $order";
 
         return $this;
     }
 
+    /**
+     * Add a LIMIT statement to this query.
+     *
+     * @param int $limit Number of rows to limit final resultset to.
+     * 
+     * @return SelectQuery This instance of SelectQuery.
+     */
     public function limit(int $limit): SelectQuery
     {
         $this->_query_limit = "LIMIT $limit";
@@ -158,17 +189,17 @@ class SelectQuery extends Query
     public function execute(): array
     {
         if ($this->_query = $this->_pdo->prepare($this->build())) {
-            if ($this->_query->execute()) {
-                try {
-                    $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
-                    $this->reset();
-
-                    return $this->_result;
-                } catch (PDOException $e) {
-                    die($e->getMessage());
-                }
-            } else {
+            if (!$this->_query->execute()) {
                 die(print_r($this->_pdo->errorInfo()));
+            }
+
+            try {
+                $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+                $this->reset();
+
+                return $this->_result;
+            } catch (PDOException $e) {
+                die($e->getMessage());
             }
         }
 
@@ -177,7 +208,7 @@ class SelectQuery extends Query
 
     public function build(): string
     {
-        $this->_query_built = $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit;
+        $this->_query_built = trim($this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit);
 
         return $this->_query_built;
     }
