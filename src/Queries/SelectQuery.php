@@ -53,7 +53,7 @@ class SelectQuery extends Query
      * Add columns to SELECT clause.
      *
      * @param array $columns Names of columns to select.
-     * 
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function columns(array $columns): SelectQuery
@@ -79,7 +79,7 @@ class SelectQuery extends Query
      * Add a single column to the SELECT clause.
      *
      * @param string $column Name of column.
-     * 
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function column(string $column): SelectQuery
@@ -161,7 +161,7 @@ class SelectQuery extends Query
      * Add a GROUP BY statement to this query.
      *
      * @param string $column Name of column to group by.
-     * 
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function groupBy(string $column): SelectQuery
@@ -176,7 +176,7 @@ class SelectQuery extends Query
      *
      * @param string $column Column name to sort results by.
      * @param string|null $order Order to sort by. Can be `DESC` or `ASC`. Defaults to `DESC`.
-     * 
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function orderBy(string $column, string $order = 'DESC'): SelectQuery
@@ -190,7 +190,7 @@ class SelectQuery extends Query
      * Add a LIMIT statement to this query.
      *
      * @param int $limit Number of rows to limit final resultset to.
-     * 
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
     public function limit(int $limit): SelectQuery

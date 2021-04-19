@@ -38,7 +38,7 @@ class Util
      * @param string $operator Operator to use in comparison.
      * @param string|null $matches Value to match with. If not provided, operator will be assumed as `=` and $operator will be used as match.
      * @param string|null $glue How to join this clause with other WHERE clauses. Can be `AND` or `OR`.
-     * 
+     *
      * @return array Validated and prepared array.
      */
     public static function handleWhereOperation(string $column, string $operator, ?string $matches = null, ?string $glue = 'AND'): array
@@ -60,7 +60,7 @@ class Util
             'glue' => $glue,
             'column' => $column,
             'operator' => $operator,
-            'matches' => $matches
+            'matches' => $matches,
         ];
     }
 

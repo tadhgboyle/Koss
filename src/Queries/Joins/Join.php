@@ -56,7 +56,7 @@ class Join
      * If not set, will use table in parent SelectQuery instance.
      *
      * @param string $through Name of table to use for lookup.
-     * 
+     *
      * @return Join This instance of join class.
      */
     public function through(string $through): Join
