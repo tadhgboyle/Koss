@@ -7,7 +7,6 @@ use ReflectionProperty;
 
 class Having
 {
-
     protected SelectQuery $_query_instance;
 
     protected static ReflectionClass $select_query_class;
@@ -56,7 +55,7 @@ class Having
         $this->submitHaving($column . ' > ' . $value, 'OR');
     }
 
-    public function equalTo(string $column, mixed $value): void 
+    public function equalTo(string $column, mixed $value): void
     {
         $this->submitHaving($column . ' = ' . $value);
     }
@@ -66,7 +65,7 @@ class Having
         $this->submitHaving($column . ' = ' . $value, 'OR');
     }
 
-    public function notEqualTo(string $column, mixed $value): void 
+    public function notEqualTo(string $column, mixed $value): void
     {
         $this->submitHaving($column . ' <> ' . $value);
     }
@@ -83,7 +82,7 @@ class Having
         $havings = self::$havings_property->getValue($this->_query_instance);
         $havings[] = [
             'glue' => $glue,
-            'having' => $having
+            'having' => $having,
         ];
 
         self::$havings_property->setValue($this->_query_instance, $havings);
