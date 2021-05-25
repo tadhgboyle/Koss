@@ -108,6 +108,30 @@ class Util
         return trim($return);
     }
 
+    public static function assembleHavingClause(array $havings): string
+    {
+        $first = true;
+        $return = '';
+
+        foreach ($havings as $having) {
+
+            if (!in_array($having['glue'], ['AND', 'OR'])) {
+                throw new StatementException('Invalid HAVING clause glue. Glue: ' . $having['glue'] . '.');
+            }
+
+            if ($first) {
+                $return .= 'HAVING ';
+                $first = false;
+            } else {
+                $return .= $having['glue'] . ' ';
+            }
+
+            $return .= $having['having'] . ' ';
+        }
+
+        return trim($return);
+    }
+
     /**
      * Escape array of strings or single string by adding $key to front and end of each string.
      * Used for preparing column and values for use in query statements.

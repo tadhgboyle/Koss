@@ -23,6 +23,7 @@ class SelectQuery extends Query
     protected string $_query_limit = '';
     protected string $_query_built = '';
     protected array $_joins = [];
+    protected array $_havings = [];
     protected array $_selected_columns = [];
 
     /**
@@ -171,6 +172,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    public function having(callable $callback): SelectQuery
+    {
+        $callback(new Having($this));
+
+        return $this;
+    }
+
     /**
      * Add an ORDER BY statement to this query.
      *
@@ -222,7 +230,7 @@ class SelectQuery extends Query
 
     public function build(): string
     {
-        $this->_query_built = trim($this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit);
+        $this->_query_built = trim($this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . Util::assembleHavingClause($this->_havings) . ' ' . $this->_query_order_by . ' ' . $this->_query_limit);
 
         return $this->_query_built;
     }
