@@ -48,7 +48,6 @@ abstract class Query
         return $this;
     }
 
-
     /**
      * Add an AND LIKE statement to this query.
      * Rereoutes to `where()` and uses `"LIKE"` as the operator.
