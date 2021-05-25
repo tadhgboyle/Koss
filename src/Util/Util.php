@@ -114,7 +114,6 @@ class Util
         $return = '';
 
         foreach ($havings as $having) {
-
             if (!in_array($having['glue'], ['AND', 'OR'])) {
                 throw new StatementException('Invalid HAVING clause glue. Glue: ' . $having['glue'] . '.');
             }
