@@ -1,7 +1,6 @@
 ![alt](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Move `like()` and `orLike()` functions to Query class.
   - Make chained join clauses more fluent, after `on()` add a `then($callback)` ?
   - Allow `where()` to take arrays and nested arrays
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.

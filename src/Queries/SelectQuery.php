@@ -130,34 +130,6 @@ class SelectQuery extends Query
     }
 
     /**
-     * Add an AND LIKE statement to this query.
-     * Rereoutes to `where()` and uses `"LIKE"` as the operator.
-     *
-     * @param string $column Column name to search in.
-     * @param string $like Value to attempt to find. Must provide `"%"` as needed.
-     *
-     * @return SelectQuery This instance of SelectQuery.
-     */
-    public function like(string $column, string $like): SelectQuery
-    {
-        return $this->where($column, 'LIKE', $like);
-    }
-
-    /**
-     * Add an OR LIKE statement to this query.
-     * Rereoutes to `orWhere()` and uses `"LIKE"` as the operator.
-     *
-     * @param string $column Column name to search in.
-     * @param string $like Value to attempt to find. Must provide `"%"` as needed.
-     *
-     * @return SelectQuery This instance of SelectQuery.
-     */
-    public function orLike(string $column, string $like): SelectQuery
-    {
-        return $this->orWhere($column, 'LIKE', $like);
-    }
-
-    /**
      * Add a GROUP BY statement to this query.
      *
      * @param string $column Name of column to group by.
