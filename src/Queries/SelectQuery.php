@@ -175,13 +175,14 @@ class SelectQuery extends Query
     }
 
     /**
-     * Cast an individual column to a type
+     * Cast an individual column to a type.
      *
      * @param string $column Name of column to preform cast on.
      * @param string $type Type to cast column data to.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function cast(string $column, string $type) : SelectQuery
+    public function cast(string $column, string $type): SelectQuery
     {
         $this->casts([$column => $type]);
 
@@ -192,9 +193,10 @@ class SelectQuery extends Query
      * Cast multiple columns to respective types.
      *
      * @param array $casts Column => Type array of casts to preform.
+     *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function casts(array $casts) : SelectQuery 
+    public function casts(array $casts): SelectQuery
     {
         foreach ($casts as $column => $type) {
             $this->_casts[$column] = $type;
@@ -235,9 +237,7 @@ class SelectQuery extends Query
         }
 
         foreach ($this->_casts as $column => $type) {
-
             foreach ($this->_result as $row) {
-
                 if (!isset($row->{$column})) {
                     continue;
                 }
