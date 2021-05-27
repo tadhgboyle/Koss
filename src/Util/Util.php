@@ -6,7 +6,6 @@ use Aberdeener\Koss\Exceptions\StatementException;
 
 class Util
 {
-
     /**
      * Create an array of `column`, `operator` and `matches` for WHERE clauses.
      * Validates that $operator is valid.
