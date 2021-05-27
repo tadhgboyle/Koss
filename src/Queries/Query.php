@@ -2,6 +2,7 @@
 
 namespace Aberdeener\Koss\Queries;
 
+use Closure;
 use Aberdeener\Koss\Util\Util;
 
 abstract class Query
@@ -48,7 +49,6 @@ abstract class Query
         return $this;
     }
 
-
     /**
      * Add an AND LIKE statement to this query.
      * Rereoutes to `where()` and uses `"LIKE"` as the operator.
@@ -78,17 +78,23 @@ abstract class Query
     }
 
     /**
-     * Execute Koss function under certain conditions.
+     * Run a Koss function only when the specified $expression is true.
      *
-     * @param callable|bool $expression Function or boolean value to eval.
-     * @param callable $callback Function to run when $expression is true.
-     * @param callable|null $fallback Function to run when $expression is false.
+     * @param Closure|bool $expression Function or boolean value to eval.
+     * @param Closure $callback Function to run when $expression is true.
+     * @param Closure|null $fallback Function to run when $expression is false.
      *
      * @return SelectQuery|UpdateQuery This instance of Query.
      */
-    public function when(callable | bool $expression, callable $callback, ?callable $fallback = null): SelectQuery | UpdateQuery
+    public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): SelectQuery | UpdateQuery
     {
-        Util::when($this, $expression, $callback, $fallback);
+        if (is_callable($expression) ? $expression() : $expression) {
+            $callback($this);
+        } else {
+            if (is_callable($fallback)) {
+                $fallback($this);
+            }
+        }
 
         return $this;
     }

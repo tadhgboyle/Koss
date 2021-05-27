@@ -3,6 +3,7 @@
 namespace Aberdeener\Koss\Queries;
 
 use PDO;
+use Closure;
 use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
@@ -91,11 +92,11 @@ class SelectQuery extends Query
     /**
      * Preform an INNER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function innerJoin(callable $callback): SelectQuery
+    public function innerJoin(Closure $callback): SelectQuery
     {
         $callback(new InnerJoin($this));
 
@@ -105,11 +106,11 @@ class SelectQuery extends Query
     /**
      * Preform a LEFT OUTER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function leftOuterJoin(callable $callback): SelectQuery
+    public function leftOuterJoin(Closure $callback): SelectQuery
     {
         $callback(new LeftOuterJoin($this));
 
@@ -119,11 +120,11 @@ class SelectQuery extends Query
     /**
      * Preform a RIGHT OUTER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function rightOuterJoin(callable $callback): SelectQuery
+    public function rightOuterJoin(Closure $callback): SelectQuery
     {
         $callback(new RightOuterJoin($this));
 

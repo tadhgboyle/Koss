@@ -2,33 +2,10 @@
 
 namespace Aberdeener\Koss\Util;
 
-use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Exceptions\StatementException;
 
 class Util
 {
-    /**
-     * Run a Koss function only when the specified $expression is true.
-     *
-     * @param Query $instance Current instance of Select/Update query to pass in background to callable function.
-     * @param callable|bool $expression Expression to run, must return bool
-     * @param callable $callback Ran if $expression is true
-     * @param callable $fallback (optional) Ran if $expression is false
-     */
-    public static function when(Query $instance, callable | bool $expression, callable $callback, ?callable $fallback = null): void
-    {
-        $expression_bool = is_callable($expression) ? $expression() : $expression;
-
-        if ($expression_bool) {
-            $callback($instance);
-            return;
-        } else {
-            if ($fallback != null) {
-                $fallback($instance);
-                return;
-            }
-        }
-    }
 
     /**
      * Create an array of `column`, `operator` and `matches` for WHERE clauses.
