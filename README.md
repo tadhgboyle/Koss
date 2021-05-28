@@ -7,7 +7,6 @@
   - Allow `where()` to take arrays and nested arrays
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
   - Depending how advanced UpdateQuery gets, make InsertQuery to help seperate the internal code
-  - Add simple `cast()` functionality (to bool, int, float, etc. Or even custom models which would impl KossCast or something)
 
 ## Documentation
 
@@ -30,10 +29,9 @@ Functions which are available in both Selection and Update/Insert queries.
   - `execute()`
     - Execute compiled Koss MySQL code and output results
     - *Note: Without calling this function at the end of your code, nothing will output!*`
-  - `when(callable|bool $expression, callable $callback, callable $fallback)`
+  - `when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null)`
     - Only execute `$callback` function when `$expression` is true. If `$fallback` is provided, it will be called when `$expression` is false.
     - *Note: `$expression` can be either a boolean value (`5 < 10`) or an anonymous function which returns a boolean value*
-    - *Note: Only some Koss functions are supported in `when()` statements. Functions: `limit()`, `orderBy()`, `where()`, `groupBy()`, `like()`*
   - `where(string $column, string $operator, string $matches)`
     - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are `$operator` to `$match`
     - *Note: If `$operator` is not provided, `'='` will be assumed*
@@ -48,7 +46,7 @@ Functions which are available in both Selection and Update/Insert queries.
   - `getAll(string $table)`
     - Select all columns in `$table`
     - Example SQL code: `SELECT * FROM users`
-  - `getSome(string $table, array|string $columns)`
+  - `getSome(string $table, array | string $columns)`
     - Select specific `$columns` (or just one column if a string is provided) in `$table`
     - Example SQL code: `SELECT username, first_name, last_name FROM users`
   - `groupBy(string $column)`
@@ -62,12 +60,25 @@ Functions which are available in both Selection and Update/Insert queries.
     - Example SQL code: `LIMIT 3`
   - `columns(array $columns)`
     - Also select `$columns` as well as whatever was passed in the original `getSome()`
+    - `column(string $column)` allows for selecting a single column.
     - Example SQL code: `SELECT username, first_name`
+  - `cast(string $column, string $type)`
+    - Cast a specific `$column`'s data to `$type` when it is retreived from the database.
+  - `casts(array $casts)`
+    - Cast multiple columns at the same time in SelectQuery.
+    - `$casts` must be an array in the format:
+        ```php
+        // Column name => Type
+        $values = array(
+        'id' => 'int',
+        'username' => 'string',
+        'money' => 'float'
+        );
+        ```
 
 ### Update/Insert Functions:
   - `update(string $table, array $values)`
     - Updates any rows in the `$table` to new `$values`.
-    - Obviously, ***must*** be followed by at least one `where()` clause.
     - `$values` must be an array in the format:
       ```php
       // Column name => Value
