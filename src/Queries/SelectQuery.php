@@ -3,6 +3,7 @@
 namespace Aberdeener\Koss\Queries;
 
 use PDO;
+use Closure;
 use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
@@ -24,6 +25,7 @@ class SelectQuery extends Query
     protected string $_query_built = '';
     protected array $_joins = [];
     protected array $_selected_columns = [];
+    protected array $_casts = [];
 
     /**
      * Create a new instance of SelectQuery.
@@ -90,11 +92,11 @@ class SelectQuery extends Query
     /**
      * Preform an INNER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `InnerJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function innerJoin(callable $callback): SelectQuery
+    public function innerJoin(Closure $callback): SelectQuery
     {
         $callback(new InnerJoin($this));
 
@@ -104,11 +106,11 @@ class SelectQuery extends Query
     /**
      * Preform a LEFT OUTER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function leftOuterJoin(callable $callback): SelectQuery
+    public function leftOuterJoin(Closure $callback): SelectQuery
     {
         $callback(new LeftOuterJoin($this));
 
@@ -118,11 +120,11 @@ class SelectQuery extends Query
     /**
      * Preform a RIGHT OUTER JOIN on this select statement.
      *
-     * @param callable $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
-    public function rightOuterJoin(callable $callback): SelectQuery
+    public function rightOuterJoin(Closure $callback): SelectQuery
     {
         $callback(new RightOuterJoin($this));
 
@@ -172,24 +174,79 @@ class SelectQuery extends Query
         return $this;
     }
 
-    public function execute(): array
+    /**
+     * Cast an individual column to a type.
+     *
+     * @param string $column Name of column to preform cast on.
+     * @param string $type Type to cast column data to.
+     *
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function cast(string $column, string $type): SelectQuery
     {
-        if ($this->_query = $this->_pdo->prepare($this->build())) {
-            if (!$this->_query->execute()) {
-                die(print_r($this->_pdo->errorInfo()));
-            }
+        $this->casts([$column => $type]);
 
-            try {
-                $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
-                $this->reset();
+        return $this;
+    }
 
-                return $this->_result;
-            } catch (PDOException $e) {
-                die($e->getMessage());
-            }
+    /**
+     * Cast multiple columns to respective types.
+     *
+     * @param array $casts Column => Type array of casts to preform.
+     *
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function casts(array $casts): SelectQuery
+    {
+        foreach ($casts as $column => $type) {
+            $this->_casts[$column] = $type;
         }
 
-        return null;
+        return $this;
+    }
+
+    public function execute(): array
+    {
+        if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+            return null;
+        }
+
+        if (!$this->_query->execute()) {
+            die(print_r($this->_pdo->errorInfo()));
+        }
+
+        $this->fetch();
+        $this->reset();
+
+        return $this->_result;
+    }
+
+    /**
+     * Execute query with PDO and preform casts if casts have been defined.
+     */
+    private function fetch(): void
+    {
+        try {
+            $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+
+        if (count($this->_casts) < 1) {
+            return;
+        }
+
+        foreach ($this->_casts as $column => $type) {
+            foreach ($this->_result as $row) {
+                if (!isset($row->{$column})) {
+                    continue;
+                }
+
+                if (!settype($row->{$column}, $type)) {
+                    unset($this->_casts[$column]);
+                }
+            }
+        }
     }
 
     public function build(): string
@@ -201,7 +258,7 @@ class SelectQuery extends Query
 
     public function reset(): void
     {
-        $this->_where = $this->_selected_columns = [];
+        $this->_where = $this->_selected_columns = $this->_casts = [];
         $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
     }
 }
