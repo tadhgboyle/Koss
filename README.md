@@ -1,4 +1,4 @@
-![alt](https://i.imgur.com/4FN4HlE.png)
+![Koss Header Image](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
   - Move `where()`, `orWhere()`, `like()`, etc to each Query subclass and use differently named functions in Query class so their return types are stricter.
@@ -69,10 +69,10 @@ Functions which are available in both Selection and Update/Insert queries.
     - `$casts` must be an array in the format:
         ```php
         // Column name => Type
-        $values = array(
-        'id' => 'int',
-        'username' => 'string',
-        'money' => 'float'
+        $casts = array(
+          'id' => 'int',
+          'username' => 'string',
+          'money' => 'float'
         );
         ```
 
