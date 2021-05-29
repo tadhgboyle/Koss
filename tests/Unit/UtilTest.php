@@ -5,7 +5,8 @@ use Aberdeener\Koss\Util\Util;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers
+ * @covers Aberdeener\Koss\Util\Util
+ * @covers Aberdeener\Koss\Exceptions\StatementException
  */
 class UtilTest extends TestCase
 {
@@ -37,6 +38,7 @@ class UtilTest extends TestCase
     public function testHandleWhereClauseFunctionWithInvalidOperator()
     {
         $this->expectException(StatementException::class);
+
         Util::handleWhereOperation('username', '!=', 'Aberdeener');
     }
 
@@ -55,6 +57,7 @@ class UtilTest extends TestCase
     public function testHandleWhereClauseFunctionWithInvalidGlue()
     {
         $this->expectException(StatementException::class);
+
         Util::handleWhereOperation('username', '=', 'Aberdeener', 'XOR');
     }
 
@@ -70,7 +73,23 @@ class UtilTest extends TestCase
 
     public function testAssembleWhereClauseFunction()
     {
+        $clauses = [
+            [
+                'column' => 'username',
+                'operator' => '=',
+                'matches' => 'Aberdeener'
+            ],
+            [
+                'glue' => 'AND',
+                'column' => 'full_name',
+                'operator' => '=',
+                'matches' => 'Tadhg Boyle'
+            ]
+        ];
 
+        $compiled_clause = Util::assembleWhereClause($clauses);
+
+        $this->assertEquals('WHERE `username` = \'Aberdeener\' AND `full_name` = \'Tadhg Boyle\'', $compiled_clause);
     }
 
     public function testEscapeStringsSingle()

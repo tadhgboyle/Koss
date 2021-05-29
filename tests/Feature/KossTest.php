@@ -4,7 +4,7 @@ use Aberdeener\Koss\Koss;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers
+ * @covers Aberdeener\Koss\Koss
  */
 class KossTest extends TestCase {
 
