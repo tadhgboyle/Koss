@@ -37,12 +37,10 @@ class Koss
      */
     public function __construct(string $host, int $port, string $database, string $username, string $password)
     {
-        try {
-            $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password);
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die($e->getMessage());
-        }
+        $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 5
+        ]);
     }
 
     /**
