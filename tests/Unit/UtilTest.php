@@ -1,8 +1,8 @@
 <?php
 
-use Aberdeener\Koss\Exceptions\StatementException;
 use Aberdeener\Koss\Util\Util;
 use PHPUnit\Framework\TestCase;
+use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * @covers Aberdeener\Koss\Util\Util
@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
  */
 class UtilTest extends TestCase
 {
-
     public function testHandleWhereClauseFunctionNoOperator()
     {
         $where_array = Util::handleWhereOperation('username', 'Aberdeener');
@@ -19,7 +18,7 @@ class UtilTest extends TestCase
             'glue' => 'AND',
             'column' => 'username',
             'operator' => '=',
-            'matches' => 'Aberdeener'
+            'matches' => 'Aberdeener',
         ], $where_array);
     }
 
@@ -31,7 +30,7 @@ class UtilTest extends TestCase
             'glue' => 'AND',
             'column' => 'username',
             'operator' => '<>',
-            'matches' => 'Aberdeener'
+            'matches' => 'Aberdeener',
         ], $where_array);
     }
 
@@ -50,7 +49,7 @@ class UtilTest extends TestCase
             'glue' => 'OR',
             'column' => 'username',
             'operator' => '=',
-            'matches' => 'Aberdeener'
+            'matches' => 'Aberdeener',
         ], $where_array);
     }
 
@@ -65,7 +64,7 @@ class UtilTest extends TestCase
     {
         $join_string = Util::assembleJoinClause([
             'INNER JOIN `nl2_users_groups` ON `nl2_users_groups`.`user_id` = `nl2_users`.`id`',
-            'INNER JOIN `nl2_groups` ON `nl2_groups`.`id` = `nl2_users_groups`.`group_id`'
+            'INNER JOIN `nl2_groups` ON `nl2_groups`.`id` = `nl2_users_groups`.`group_id`',
         ]);
 
         $this->assertEquals(
@@ -80,14 +79,14 @@ class UtilTest extends TestCase
             [
                 'column' => 'username',
                 'operator' => '=',
-                'matches' => 'Aberdeener'
+                'matches' => 'Aberdeener',
             ],
             [
                 'glue' => 'AND',
                 'column' => 'full_name',
                 'operator' => '=',
-                'matches' => 'Tadhg Boyle'
-            ]
+                'matches' => 'Tadhg Boyle',
+            ],
         ];
 
         $compiled_clause = Util::assembleWhereClause($clauses);

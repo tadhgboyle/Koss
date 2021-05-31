@@ -6,11 +6,11 @@ use PHPUnit\Framework\TestCase;
 /**
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\SelectQuery
- * 
+ *
  * @covers Aberdeener\Koss\Koss
  */
-class KossTest extends TestCase {
-
+class KossTest extends TestCase
+{
     public function testCanCreateKossInstance()
     {
         $koss = new Koss('localhost', 3306, 'koss', 'root', '');
@@ -43,5 +43,4 @@ class KossTest extends TestCase {
 
     //     $koss = new Koss('google.com', 3306, 'koss', 'root', '');
     // }
-
 }
