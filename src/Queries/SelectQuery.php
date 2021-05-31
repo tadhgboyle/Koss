@@ -251,7 +251,7 @@ class SelectQuery extends Query
 
     public function build(): string
     {
-        $this->_query_built = trim($this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit);
+        $this->_query_built = trim(preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit));
 
         return $this->_query_built;
     }

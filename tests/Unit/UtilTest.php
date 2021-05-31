@@ -68,7 +68,10 @@ class UtilTest extends TestCase
             'INNER JOIN `nl2_groups` ON `nl2_groups`.`id` = `nl2_users_groups`.`group_id`'
         ]);
 
-        $this->assertEquals('INNER JOIN `nl2_users_groups` ON `nl2_users_groups`.`user_id` = `nl2_users`.`id` INNER JOIN `nl2_groups` ON `nl2_groups`.`id` = `nl2_users_groups`.`group_id`', $join_string);
+        $this->assertEquals(
+            'INNER JOIN `nl2_users_groups` ON `nl2_users_groups`.`user_id` = `nl2_users`.`id` INNER JOIN `nl2_groups` ON `nl2_groups`.`id` = `nl2_users_groups`.`group_id`',
+            $join_string
+        );
     }
 
     public function testAssembleWhereClauseFunction()
@@ -89,7 +92,10 @@ class UtilTest extends TestCase
 
         $compiled_clause = Util::assembleWhereClause($clauses);
 
-        $this->assertEquals('WHERE `username` = \'Aberdeener\' AND `full_name` = \'Tadhg Boyle\'', $compiled_clause);
+        $this->assertEquals(
+            "WHERE `username` = 'Aberdeener' AND `full_name` = 'Tadhg Boyle'",
+            $compiled_clause
+        );
     }
 
     public function testEscapeStringsSingle()

@@ -70,7 +70,7 @@ class Join
      * Set which columns to preform the ON operation on.
      *
      * @param string $foreign_id Name of column in $_table to use for lookup.
-     * @param string|null $local_id Name of column to use in this table for lookup. If not provided, will attempt to use same column name as $foreign_id.
+     * @param string|null $local_id Name of column to use in this table for lookup. If not provided, will use same value as $foreign_id.
      */
     public function on(string $foreign_id, ?string $local_id = null): void
     {
