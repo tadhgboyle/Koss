@@ -116,14 +116,8 @@ abstract class Query
 
     /**
      * Output the built string of all queries so far.
-     */
-    final public function toString(): string
-    {
-        return $this->build();
-    }
-
-    /**
-     * Output the built string of all queries so far.
+     * 
+     * @codeCoverageIgnore
      */
     final public function __toString(): string
     {

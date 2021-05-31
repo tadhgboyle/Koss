@@ -208,11 +208,15 @@ class SelectQuery extends Query
     public function execute(): array
     {
         if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+            // @codeCoverageIgnoreStart
             return null;
+            // @codeCoverageIgnoreEnd
         }
 
         if (!$this->_query->execute()) {
+            // @codeCoverageIgnoreStart
             die(print_r($this->_pdo->errorInfo()));
+            // @codeCoverageIgnoreEnd
         }
 
         $this->fetch();
@@ -228,9 +232,11 @@ class SelectQuery extends Query
     {
         try {
             $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+            // @codeCoverageIgnoreStart
         } catch (PDOException $e) {
             die($e->getMessage());
         }
+        // @codeCoverageIgnoreEnd
 
         if (count($this->_casts) < 1) {
             return;
@@ -242,9 +248,7 @@ class SelectQuery extends Query
                     continue;
                 }
 
-                if (!settype($row->{$column}, $type)) {
-                    unset($this->_casts[$column]);
-                }
+                settype($row->{$column}, $type);
             }
         }
     }

@@ -133,5 +133,25 @@ class SelectQueryTest extends TestCase
         );
     }
 
-    // TODO: Cast(s) functions
+    public function testGetAllAndCastIndividual()
+    {
+        $results = $this->koss->getAll('users')->cast('balance', 'float')->execute();
+
+        $this->assertIsFloat($results[0]->balance);
+    }
+
+    public function testGetAllAndCastMultiple()
+    {
+        $results = $this->koss->getAll('users')->casts(['username' => 'string', 'balance' => 'float'])->execute();
+
+        $this->assertIsString($results[0]->username);
+        $this->assertIsFloat($results[0]->balance);
+    }
+
+    public function testGetAllAndCastNonexistantColumn()
+    {
+        $results = $this->koss->getAll('users')->cast('address', 'string')->execute();
+
+        $this->assertNotContains('address', $results);
+    }
 }

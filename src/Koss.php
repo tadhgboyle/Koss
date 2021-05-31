@@ -132,16 +132,13 @@ class Koss
         switch ($token) {
             case 'SELECT':
                 return (new SelectQuery($this->_pdo, [], $query))->execute();
-                break;
 
             case 'INSERT':
             case 'UPDATE':
                 return (new UpdateQuery($this->_pdo, $query))->execute();
-                break;
 
             default:
                 throw new StatementException("Unsupported start of MySQL query string. Token: $token.");
-                break;
         }
     }
 }

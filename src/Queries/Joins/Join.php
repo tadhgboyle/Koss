@@ -113,6 +113,7 @@ class Join
     /**
      * Print query for this JOIN clause.
      * Forwards request to `build()` function.
+     * @codeCoverageIgnore
      *
      * @return string Built query.
      */

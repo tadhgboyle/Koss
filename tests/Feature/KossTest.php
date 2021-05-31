@@ -1,5 +1,6 @@
 <?php
 
+use Aberdeener\Koss\Exceptions\StatementException;
 use Aberdeener\Koss\Koss;
 use PHPUnit\Framework\TestCase;
 
@@ -8,6 +9,7 @@ use PHPUnit\Framework\TestCase;
  * @uses Aberdeener\Koss\Queries\SelectQuery
  *
  * @covers Aberdeener\Koss\Koss
+ * @covers Aberdeener\Koss\Exceptions\StatementException
  */
 class KossTest extends TestCase
 {
@@ -34,6 +36,14 @@ class KossTest extends TestCase
     public function testRawExecuteUpdating()
     {
         $koss = new Koss('localhost', 3306, 'koss', 'root', '');
+    }
+
+    public function testExceptionOnInvalidQuery()
+    {
+        $this->expectException(StatementException::class);
+
+        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
+        $koss->execute('NULL');
     }
 
     // TODO: PDO timeout of 5 seconds makes tests really annoying to run, alternate way?

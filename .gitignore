@@ -3,3 +3,4 @@ config.php
 index.php
 /vendor/
 .phpunit.cache/
+/coverage/
