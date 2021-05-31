@@ -1,19 +1,18 @@
 <?php
 
 use Aberdeener\Koss\Koss;
-use Aberdeener\Koss\Queries\SelectQuery;
 use PHPUnit\Framework\TestCase;
+use Aberdeener\Koss\Queries\SelectQuery;
 
 /**
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\SelectQuery
  */
 class SelectQueryTest extends TestCase
 {
-
     private Koss $koss;
 
     public function setUp(): void
@@ -24,9 +23,7 @@ class SelectQueryTest extends TestCase
     public function testGetAllColumns()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users`',
-
             $this->koss->getAll('users')->build()
         );
     }
@@ -41,9 +38,7 @@ class SelectQueryTest extends TestCase
     public function testGetSomeColumns()
     {
         $this->assertEquals(
-
             'SELECT `username`, `full_name` FROM `users`',
-
             $this->koss->getSome('users', ['username', 'full_name'])->build()
         );
     }
@@ -51,9 +46,7 @@ class SelectQueryTest extends TestCase
     public function testGetSingleColumn()
     {
         $this->assertEquals(
-
             'SELECT `username` FROM `users`',
-
             $this->koss->getSome('users', 'username')->build()
         );
     }
@@ -61,9 +54,7 @@ class SelectQueryTest extends TestCase
     public function testGetSingleColumnThenAnother()
     {
         $this->assertEquals(
-
             'SELECT `username`, `full_name` FROM `users`',
-
             $this->koss->getSome('users', 'username')->column('full_name')->build()
         );
     }
@@ -71,9 +62,7 @@ class SelectQueryTest extends TestCase
     public function testGetSingleColumnThenAll()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users`',
-
             $this->koss->getSome('users', 'username')->column('*')->build()
         );
     }
@@ -81,9 +70,7 @@ class SelectQueryTest extends TestCase
     public function testGetSingleColumnThenMore()
     {
         $this->assertEquals(
-
             'SELECT `username`, `full_name`, `phone_number` FROM `users`',
-
             $this->koss->getSome('users', 'username')->columns(['full_name', 'phone_number'])->build()
         );
     }
@@ -91,9 +78,7 @@ class SelectQueryTest extends TestCase
     public function testOrderByWithNoOrder()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` ORDER BY `user_id` DESC',
-
             $this->koss->getAll('users')->orderBy('user_id')->build()
         );
     }
@@ -101,9 +86,7 @@ class SelectQueryTest extends TestCase
     public function testOrderByWithExplicitOrder()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` ORDER BY `user_id` ASC',
-
             $this->koss->getAll('users')->orderBy('user_id', 'ASC')->build()
         );
     }
@@ -111,9 +94,7 @@ class SelectQueryTest extends TestCase
     public function testGroupBy()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` GROUP BY `phone_number`',
-
             $this->koss->getAll('users')->groupBy('phone_number')->build()
         );
     }
@@ -121,9 +102,7 @@ class SelectQueryTest extends TestCase
     public function testLimit()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` LIMIT 5',
-
             $this->koss->getAll('users')->limit(5)->build()
         );
     }
@@ -131,19 +110,15 @@ class SelectQueryTest extends TestCase
     public function testWhenWithTrueAndNoFallback()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` LIMIT 5',
-
-            $this->koss->getAll('users')->when(fn() => true, fn(SelectQuery $query) => $query->limit(5))->build()
-        ); 
+            $this->koss->getAll('users')->when(fn () => true, fn (SelectQuery $query) => $query->limit(5))->build()
+        );
     }
 
     public function testWhenWithFalseAndNoFallback()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users`',
-
             $this->koss->getAll('users')->when(fn () => false, fn (SelectQuery $query) => $query->limit(5))->build()
         );
     }
@@ -151,10 +126,8 @@ class SelectQueryTest extends TestCase
     public function testWhenWithFalseAndWithFallback()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` ORDER BY `full_name` DESC',
-
-            $this->koss->getAll('users')->when(fn () => false, fn() => null, function (SelectQuery $query) {
+            $this->koss->getAll('users')->when(fn () => false, fn () => null, function (SelectQuery $query) {
                 return $query->orderBy('full_name');
             })->build()
         );

@@ -7,12 +7,11 @@ use PHPUnit\Framework\TestCase;
  * @uses Aberdeener\Koss\Koss
  * @uses Aberdeener\Koss\Queries\SelectQuery
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Query
  */
 class QueryTest extends TestCase
 {
-
     private Koss $koss;
 
     public function setUp(): void
@@ -23,9 +22,7 @@ class QueryTest extends TestCase
     public function testWhereNoOperator()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener'",
-
             $this->koss->getAll('users')->where('username', 'Aberdeener')->build()
         );
     }
@@ -33,9 +30,7 @@ class QueryTest extends TestCase
     public function testWhereWithExplicitOperator()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` <> 'yangyang200'",
-
             $this->koss->getAll('users')->where('username', '<>', 'yangyang200')->build()
         );
     }
@@ -43,9 +38,7 @@ class QueryTest extends TestCase
     public function testWhereMultiple()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener' AND `full_name` <> 'Ronan Boyle'",
-
             $this->koss->getAll('users')->where('username', 'Aberdeener')->where('full_name', '<>', 'Ronan Boyle')->build()
         );
     }
@@ -53,9 +46,7 @@ class QueryTest extends TestCase
     public function testOrWhereNoOperator()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener'",
-
             $this->koss->getAll('users')->orWhere('username', 'Aberdeener')->build()
         );
     }
@@ -63,9 +54,7 @@ class QueryTest extends TestCase
     public function testOrWhereWithExplicitOperator()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` <> 'yangyang200'",
-
             $this->koss->getAll('users')->orWhere('username', '<>', 'yangyang200')->build()
         );
     }
@@ -73,9 +62,7 @@ class QueryTest extends TestCase
     public function testOrWhereMultiple()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener' OR `full_name` = 'Tadhg Boyle'",
-
             $this->koss->getAll('users')->orWhere('username', 'Aberdeener')->orWhere('full_name', '=', 'Tadhg Boyle')->build()
         );
     }
@@ -83,9 +70,7 @@ class QueryTest extends TestCase
     public function testLike()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` LIKE '%Aberdeener%'",
-
             $this->koss->getAll('users')->like('username', '%Aberdeener%')->build()
         );
     }
@@ -93,9 +78,7 @@ class QueryTest extends TestCase
     public function testOrLike()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` LIKE '%Aberdeener%'",
-
             $this->koss->getAll('users')->orLike('username', '%Aberdeener%')->build()
         );
     }
@@ -103,9 +86,7 @@ class QueryTest extends TestCase
     public function testOrLikeMultiple()
     {
         $this->assertEquals(
-
             "SELECT * FROM `users` WHERE `username` LIKE '%Aberdeener%' OR `full_name` LIKE '%Tadhg Boyle%'",
-
             $this->koss->getAll('users')->orLike('username', '%Aberdeener%')->orLike('full_name', '%Tadhg Boyle%')->build()
         );
     }

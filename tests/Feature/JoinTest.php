@@ -1,16 +1,16 @@
 <?php
 
-use Aberdeener\Koss\Exceptions\JoinException;
 use Aberdeener\Koss\Koss;
+use PHPUnit\Framework\TestCase;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
+use Aberdeener\Koss\Exceptions\JoinException;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
 use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @uses Aberdeener\Koss\Koss
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Joins\Join
  * @covers Aberdeener\Koss\Exceptions\JoinException
  * @covers Aberdeener\Koss\Queries\Joins\InnerJoin
@@ -30,9 +30,7 @@ class JoinTest extends TestCase
     public function testInnerJoin()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` INNER JOIN `users_groups` ON `users_groups`.`users_id` = `users`.`users_id`',
-
             $this->koss->getAll('users')->innerJoin(function (InnerJoin $join) {
                 $join->table('users_groups')->on('users_id');
             })->build()
@@ -51,9 +49,7 @@ class JoinTest extends TestCase
     public function testInnerJoinUsingThrough()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` INNER JOIN `users_groups` ON `users_groups`.`user_id` = `users`.`id` INNER JOIN `groups` ON `groups`.`id` = `users_groups`.`group_id`',
-
             $this->koss->getAll('users')->innerJoin(function (InnerJoin $join) {
                 $join->table('users_groups')->on('user_id', 'id');
                 $join->table('groups')->through('users_groups')->on('id', 'group_id');
@@ -64,9 +60,7 @@ class JoinTest extends TestCase
     public function testLeftOuterJoin()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` LEFT OUTER JOIN `users_groups` ON `users_groups`.`users_id` = `users`.`users_id`',
-
             $this->koss->getAll('users')->leftOuterJoin(function (LeftOuterJoin $join) {
                 $join->table('users_groups')->on('users_id');
             })->build()
@@ -76,9 +70,7 @@ class JoinTest extends TestCase
     public function testRightOuterJoin()
     {
         $this->assertEquals(
-
             'SELECT * FROM `users` RIGHT OUTER JOIN `users_groups` ON `users_groups`.`users_id` = `users`.`users_id`',
-
             $this->koss->getAll('users')->rightOuterJoin(function (RightOuterJoin $join) {
                 $join->table('users_groups')->on('users_id');
             })->build()

@@ -3,7 +3,6 @@
 namespace Aberdeener\Koss;
 
 use PDO;
-use PDOException;
 use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\SelectQuery;
@@ -39,7 +38,7 @@ class Koss
     {
         $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => 5
+            PDO::ATTR_TIMEOUT => 5,
         ]);
     }
 
