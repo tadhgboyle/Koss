@@ -125,7 +125,7 @@ class Koss
      *
      * @return array|int Array of select values, or int of number of rows changed - depending on statement type.
      */
-    public function execute(string $query): array
+    public function execute(string $query): array | int
     {
         $token = explode(' ', $query)[0];
 

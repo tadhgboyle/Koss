@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\SelectQuery
+ * @uses Aberdeener\Koss\Queries\UpdateQuery
  *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Exceptions\StatementException
@@ -31,14 +32,18 @@ class KossTest extends TestCase
     public function testRawExecuteInserting()
     {
         $koss = new Koss('localhost', 3306, 'koss', 'root', '');
+
+        $this->assertEquals(1, $koss->execute("INSERT INTO users (username, full_name, balance) VALUES ('Aberdeener', 'Tadhg Boyle', 123.45)"));
     }
 
     public function testRawExecuteUpdating()
     {
         $koss = new Koss('localhost', 3306, 'koss', 'root', '');
+
+        $this->assertIsInt($koss->execute("UPDATE users SET username = 'Aber' WHERE balance = 123.45"));
     }
 
-    public function testExceptionOnInvalidQuery()
+    public function testExceptionOnInvalidRawQuery()
     {
         $this->expectException(StatementException::class);
 

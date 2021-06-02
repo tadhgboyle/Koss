@@ -51,27 +51,27 @@ class UpdateQuery extends Query
 
     public function execute(): int
     {
-        if ($this->_query = $this->_pdo->prepare($this->build())) {
-            if ($this->_query->execute()) {
-                try {
-                    $this->_result = $this->_query->rowCount();
-                    $this->reset();
-
-                    return $this->_result;
-                } catch (PDOException $e) {
-                    die($e->getMessage());
-                }
-            }
-
-            die(print_r($this->_pdo->errorInfo()));
+        if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+            // @codeCoverageIgnoreStart
+            return -1;
+            // @codeCoverageIgnoreEnd
         }
 
-        return -1;
+        if (!$this->_query->execute()) {
+            // @codeCoverageIgnoreStart
+            die(print_r($this->_pdo->errorInfo()));
+            // @codeCoverageIgnoreEnd
+        }
+
+        $this->_result = $this->_query->rowCount();
+        $this->reset();
+
+        return $this->_result;
     }
 
     public function build(): string
     {
-        $this->_query_built = $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Util::assembleWhereClause($this->_where);
+        $this->_query_built = trim(preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Util::assembleWhereClause($this->_where)));
 
         return $this->_query_built;
     }
