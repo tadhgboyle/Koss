@@ -2,9 +2,9 @@
 
 use Aberdeener\Koss\Koss;
 use PHPUnit\Framework\TestCase;
+use Aberdeener\Koss\Queries\Joins\Join;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
 use Aberdeener\Koss\Exceptions\JoinException;
-use Aberdeener\Koss\Queries\Joins\Join;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
 use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 

@@ -1,8 +1,8 @@
 <?php
 
-use Aberdeener\Koss\Exceptions\StatementException;
 use Aberdeener\Koss\Koss;
 use PHPUnit\Framework\TestCase;
+use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * @uses Aberdeener\Koss\Util\Util

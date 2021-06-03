@@ -3,7 +3,6 @@
 namespace Aberdeener\Koss\Queries;
 
 use PDO;
-use PDOException;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 
