@@ -116,7 +116,7 @@ abstract class Query
 
     /**
      * Output the built string of all queries so far.
-     * 
+     *
      * @codeCoverageIgnore
      */
     final public function __toString(): string

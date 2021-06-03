@@ -5,14 +5,13 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\UpdateQuery
  */
 class UpdateQueryTest extends TestCase
 {
-
     private Koss $koss;
 
     public function setUp(): void
