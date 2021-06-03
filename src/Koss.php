@@ -111,7 +111,7 @@ class Koss
             $values_compiled .= "`$column` = '$value', ";
         }
 
-        $values_compiled = rtrim($values_compiled, ',');
+        $values_compiled = rtrim($values_compiled, ', ');
 
         $this->_query_instance = new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
 

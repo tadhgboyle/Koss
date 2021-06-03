@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
  * @uses Aberdeener\Koss\Util\Util
  * 
  * @covers Aberdeener\Koss\Koss
+ * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\UpdateQuery
  */
 class UpdateQueryTest extends TestCase
@@ -40,6 +41,22 @@ class UpdateQueryTest extends TestCase
         $this->assertSame(
             1,
             $this->koss->insert('users', ['username' => 'Aberdeener', 'full_name' => 'Tadhg Boyle'])->execute()
+        );
+    }
+
+    public function testUpdate()
+    {
+        $this->assertEquals(
+            "UPDATE `users` SET `username` = 'thebossman' WHERE `username` <> 'Aberdeener'",
+            $this->koss->update('users', ['username' => 'thebossman'])->where('username', '<>', 'Aberdeener')->build()
+        );
+    }
+
+    public function testCanUpdate()
+    {
+        $this->assertEquals(
+            1,
+            ''
         );
     }
 }
