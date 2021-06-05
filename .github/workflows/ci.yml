@@ -7,9 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: PHPUnit Tests
       - uses: actions/checkout@v2
-      - uses: php-actions/phpunit@v2
+
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@v2
         with:
           bootstrap: vendor/autoload.php
           args: --coverage-text
