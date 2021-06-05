@@ -15,4 +15,4 @@ jobs:
         uses: php-actions/phpunit@v2
         with:
           bootstrap: vendor/autoload.php
-          args: --coverage-text --textdox
+          args: --coverage-text
