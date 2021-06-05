@@ -9,8 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: php-actions/composer@v5
+
       - name: PHPUnit Tests
         uses: php-actions/phpunit@v2
         with:
-          bootstrap: vendor/autoload.php
-          args: --coverage-text
+          bootstrap: ../../vendor/autoload.php
