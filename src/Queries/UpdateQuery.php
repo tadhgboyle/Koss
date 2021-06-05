@@ -10,6 +10,7 @@ class UpdateQuery extends Query
 {
     protected PDO $_pdo;
     protected PDOStatement $_query;
+    protected int $_result;
 
     protected string $_query_insert = '';
     protected string $_query_where = '';

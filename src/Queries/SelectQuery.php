@@ -15,6 +15,7 @@ class SelectQuery extends Query
 {
     protected PDO $_pdo;
     protected PDOStatement $_query;
+    protected array $_result;
 
     protected string $_table;
     protected string $_query_select = '';
