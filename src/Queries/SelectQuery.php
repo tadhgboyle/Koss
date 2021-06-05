@@ -15,6 +15,7 @@ class SelectQuery extends Query
 {
     protected PDO $_pdo;
     protected PDOStatement $_query;
+    protected array $_result;
 
     protected string $_table;
     protected string $_query_select = '';
@@ -208,11 +209,15 @@ class SelectQuery extends Query
     public function execute(): array
     {
         if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+            // @codeCoverageIgnoreStart
             return null;
+            // @codeCoverageIgnoreEnd
         }
 
         if (!$this->_query->execute()) {
+            // @codeCoverageIgnoreStart
             die(print_r($this->_pdo->errorInfo()));
+            // @codeCoverageIgnoreEnd
         }
 
         $this->fetch();
@@ -228,9 +233,11 @@ class SelectQuery extends Query
     {
         try {
             $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+            // @codeCoverageIgnoreStart
         } catch (PDOException $e) {
             die($e->getMessage());
         }
+        // @codeCoverageIgnoreEnd
 
         if (count($this->_casts) < 1) {
             return;
@@ -242,16 +249,14 @@ class SelectQuery extends Query
                     continue;
                 }
 
-                if (!settype($row->{$column}, $type)) {
-                    unset($this->_casts[$column]);
-                }
+                settype($row->{$column}, $type);
             }
         }
     }
 
     public function build(): string
     {
-        $this->_query_built = trim($this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit);
+        $this->_query_built = trim(preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit));
 
         return $this->_query_built;
     }

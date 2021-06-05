@@ -9,6 +9,9 @@
             "email": "tadhgsmboyle@gmail.com"
         }
     ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
     "autoload": {
         "psr-4": {
             "Aberdeener\\Koss\\": "src/"

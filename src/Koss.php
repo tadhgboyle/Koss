@@ -3,7 +3,6 @@
 namespace Aberdeener\Koss;
 
 use PDO;
-use PDOException;
 use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\SelectQuery;
@@ -37,12 +36,10 @@ class Koss
      */
     public function __construct(string $host, int $port, string $database, string $username, string $password)
     {
-        try {
-            $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password);
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die($e->getMessage());
-        }
+        $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 5,
+        ]);
     }
 
     /**
@@ -114,7 +111,7 @@ class Koss
             $values_compiled .= "`$column` = '$value', ";
         }
 
-        $values_compiled = rtrim($values_compiled, ',');
+        $values_compiled = rtrim($values_compiled, ', ');
 
         $this->_query_instance = new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
 
@@ -128,23 +125,20 @@ class Koss
      *
      * @return array|int Array of select values, or int of number of rows changed - depending on statement type.
      */
-    public function execute(string $query): array
+    public function execute(string $query): array | int
     {
         $token = explode(' ', $query)[0];
 
         switch ($token) {
             case 'SELECT':
                 return (new SelectQuery($this->_pdo, [], $query))->execute();
-                break;
 
             case 'INSERT':
             case 'UPDATE':
                 return (new UpdateQuery($this->_pdo, $query))->execute();
-                break;
 
             default:
                 throw new StatementException("Unsupported start of MySQL query string. Token: $token.");
-                break;
         }
     }
 }
