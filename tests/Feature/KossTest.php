@@ -43,13 +43,13 @@ class KossTest extends TestCase
         $this->assertIsInt($koss->execute("UPDATE users SET username = 'Aber' WHERE balance = 123.45"));
     }
 
-    // public function testExceptionOnInvalidRawQuery()
-    // {
-    //     $this->expectException(StatementException::class);
+    public function testExceptionOnInvalidRawQuery()
+    {
+        $this->expectException(StatementException::class);
 
-    //     $koss = new Koss('localhost', 3306, 'koss', 'root', '');
-    //     $koss->execute('NULL');
-    // }
+        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
+        $koss->execute('NULL');
+    }
 
     // TODO: PDO timeout of 5 seconds makes tests really annoying to run, alternate way?
     // public function testExceptionWithInvalidDatabaseCredentials()
