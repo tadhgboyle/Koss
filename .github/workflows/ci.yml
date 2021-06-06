@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: apt install php-mysql
+      - run: sudo apt install php-mysql
 
       - uses: php-actions/composer@v5
 
