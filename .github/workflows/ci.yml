@@ -9,8 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: sudo apt install php-mysql
-
       - uses: php-actions/composer@v5
 
       - name: PHPUnit Tests
