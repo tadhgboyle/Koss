@@ -16,9 +16,9 @@ abstract class Query
      * @param string $operator Operator to use for comparison.
      * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
      *
-     * @return SelectQuery|UpdateQuery This instance of Query.
+     * @return static This instance of Query.
      */
-    public function where(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
+    public function where(string $column, string $operator, ?string $matches = null): static
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
@@ -36,9 +36,9 @@ abstract class Query
      * @param string $operator Operator to use for comparison.
      * @param string|null $matches Value to compare to. If not provided, $operator will be used and `=` will be assumed as operator.
      *
-     * @return SelectQuery|UpdateQuery This instance of Query.
+     * @return static This instance of Query.
      */
-    public function orWhere(string $column, string $operator, ?string $matches = null): SelectQuery | UpdateQuery
+    public function orWhere(string $column, string $operator, ?string $matches = null): static
     {
         $append = Util::handleWhereOperation($column, $operator, $matches, 'OR');
 
@@ -56,9 +56,9 @@ abstract class Query
      * @param string $column Column name to search in.
      * @param string $like Value to attempt to find. Must provide `"%"` as needed.
      *
-     * @return SelectQuery|UpdateQuery This instance of Query.
+     * @return static This instance of Query.
      */
-    public function like(string $column, string $like): SelectQuery | UpdateQuery
+    public function like(string $column, string $like): static
     {
         return $this->where($column, 'LIKE', $like);
     }
@@ -70,9 +70,9 @@ abstract class Query
      * @param string $column Column name to search in.
      * @param string $like Value to attempt to find. Must provide `"%"` as needed.
      *
-     * @return SelectQuery|UpdateQuery This instance of Query.
+     * @return static This instance of Query.
      */
-    public function orLike(string $column, string $like): SelectQuery | UpdateQuery
+    public function orLike(string $column, string $like): static
     {
         return $this->orWhere($column, 'LIKE', $like);
     }
@@ -84,9 +84,9 @@ abstract class Query
      * @param Closure $callback Function to run when $expression is true.
      * @param Closure|null $fallback Function to run when $expression is false.
      *
-     * @return SelectQuery|UpdateQuery This instance of Query.
+     * @return static This instance of Query.
      */
-    public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): SelectQuery | UpdateQuery
+    public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): static
     {
         if (is_callable($expression) ? $expression() : $expression) {
             $callback($this);
