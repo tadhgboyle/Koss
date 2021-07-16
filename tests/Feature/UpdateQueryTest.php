@@ -53,9 +53,6 @@ class UpdateQueryTest extends TestCase
 
     public function testCanUpdate()
     {
-        $this->assertEquals(
-            1,
-            ''
-        );
+        $this->markTestIncomplete();
     }
 }

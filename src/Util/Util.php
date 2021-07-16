@@ -78,7 +78,7 @@ class Util
                 $return .= $clause['glue'] . ' ';
             }
 
-            $return .= '`' . $clause['column'] . '` ' . $clause['operator'] . ' \'' . $clause['matches'] . '\' ';
+            $return .= "`{$clause['column']}` {$clause['operator']} '{$clause['matches']}' ";
         }
 
         return trim($return);
@@ -96,15 +96,22 @@ class Util
     public static function escapeStrings(array | string $strings, string $key = '`'): array | string
     {
         if (!is_array($strings)) {
-            return $key . $strings . $key;
+            return self::wrapString($key, $strings);
         }
 
-        $escaped = [];
+        return array_map(fn($string) => self::wrapString($key, $string), $strings);
+    }
 
-        foreach ($strings as $string) {
-            $escaped[] = $key . $string . $key;
-        }
-
-        return $escaped;
+    /**
+     * Surround $string by $key.
+     * 
+     * @param string $key Character to wrap $string in.
+     * @param string $string String to wrap.
+     * 
+     * @return string Wrapped $string.
+     */
+    private static function wrapString(string $key, string $string): string
+    {
+        return $key . $string . $key;
     }
 }

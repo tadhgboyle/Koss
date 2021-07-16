@@ -68,8 +68,8 @@ class SelectQuery extends Query
                 $new_columns[] = $column;
             }
         }
-
-        if (substr($this->_query_select, -1) != ',') {
+        
+        if (!str_ends_with($this->_query_select, ',')) {
             $this->_query_select .= ', ';
         }
 
@@ -263,7 +263,15 @@ class SelectQuery extends Query
 
     public function reset(): void
     {
-        $this->_where = $this->_selected_columns = $this->_casts = [];
-        $this->_query_select = $this->_query_from = $this->_query_group_by = $this->_query_order_by = $this->_query_limit = $this->_query_built = '';
+        $this->_query_select = '';
+        $this->_query_from = '';
+        $this->_query_group_by = '';
+        $this->_query_order_by = '';
+        $this->_query_limit = '';
+        $this->_query_built = '';
+
+        $this->_where = [];
+        $this->_selected_columns = [];
+        $this->_casts = [];
     }
 }

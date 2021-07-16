@@ -1,7 +1,7 @@
 ![Koss Header Image](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - Move `where()`, `orWhere()`, `like()`, etc to each Query subclass and use differently named functions in Query class so their return types are stricter.
+  - "Bootstrap" SelectQuery and UpdateQuery instances (remove janky string insertions and use functions instead)
   - Make chained join clauses more fluent, after `on()` add a `then($callback)` (instead of current behaviour of multiple seperate calls and usage of `through($table)`) ?
   - Allow `where()` to take arrays and nested arrays
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.

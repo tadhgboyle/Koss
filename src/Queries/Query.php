@@ -22,7 +22,7 @@ abstract class Query
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
-        if ($append != null) {
+        if (!is_null($append)) {
             $this->_where[] = $append;
         }
 
@@ -42,7 +42,7 @@ abstract class Query
     {
         $append = Util::handleWhereOperation($column, $operator, $matches, 'OR');
 
-        if ($append != null) {
+        if (!is_null($append)) {
             $this->_where[] = $append;
         }
 
