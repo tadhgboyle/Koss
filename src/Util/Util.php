@@ -99,15 +99,15 @@ class Util
             return self::wrapString($key, $strings);
         }
 
-        return array_map(fn($string) => self::wrapString($key, $string), $strings);
+        return array_map(fn ($string) => self::wrapString($key, $string), $strings);
     }
 
     /**
      * Surround $string by $key.
-     * 
+     *
      * @param string $key Character to wrap $string in.
      * @param string $string String to wrap.
-     * 
+     *
      * @return string Wrapped $string.
      */
     private static function wrapString(string $key, string $string): string

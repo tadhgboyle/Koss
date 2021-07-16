@@ -68,7 +68,7 @@ class SelectQuery extends Query
                 $new_columns[] = $column;
             }
         }
-        
+
         if (!str_ends_with($this->_query_select, ',')) {
             $this->_query_select .= ', ';
         }
