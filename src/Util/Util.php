@@ -103,13 +103,8 @@ class Util
     }
 
     /**
-<<<<<<< HEAD
      * Surround $string by $key if it is not an asterisk character.
      * 
-=======
-     * Surround $string by $key.
-     *
->>>>>>> d0067a1dd94e20f143a4bbf7b105659e6b5b91e9
      * @param string $key Character to wrap $string in.
      * @param string $string String to wrap.
      *
