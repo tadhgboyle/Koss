@@ -10,31 +10,26 @@ use Aberdeener\Koss\Exceptions\JoinException;
 
 class Join
 {
-    protected SelectQuery $_query_instance;
+    protected string $table;
+    protected string $through;
+    protected string $foreignId;
+    protected string $localId;
 
-    protected string $_keyword;
-    protected string $_table;
-    protected string $_through;
-    protected string $_foreign_id;
-    protected string $_local_id;
-    protected string $_join_built;
+    protected static ReflectionClass $selectQueryClass;
+    protected static ReflectionProperty $tableProperty;
+    protected static ReflectionProperty $joinsProperty;
 
-    protected static ReflectionClass $select_query_class;
-    protected static ReflectionProperty $table_property;
-    protected static ReflectionProperty $joins_property;
-
-    public function __construct(string $keyword, SelectQuery $query_instance)
-    {
+    public function __construct(
+        protected string $keyword,
+        protected SelectQuery $queryInstance
+    ) {
         if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER'])) {
             throw new JoinException("Invalid JOIN clause keyword. Keyword: $keyword");
         }
 
-        $this->_keyword = $keyword;
-        $this->_query_instance = $query_instance;
-
-        self::$select_query_class = new ReflectionClass(SelectQuery::class);
-        self::$table_property = self::$select_query_class->getProperty('_table');
-        self::$joins_property = self::$select_query_class->getProperty('_joins');
+        self::$selectQueryClass = new ReflectionClass(SelectQuery::class);
+        self::$tableProperty = self::$selectQueryClass->getProperty('table');
+        self::$joinsProperty = self::$selectQueryClass->getProperty('joins');
     }
 
     /**
@@ -46,7 +41,7 @@ class Join
      */
     public function table(string $table): Join
     {
-        $this->_table = $table;
+        $this->table = $table;
 
         return $this;
     }
@@ -61,7 +56,7 @@ class Join
      */
     public function through(string $through): Join
     {
-        $this->_through = $through;
+        $this->through = $through;
 
         return $this;
     }
@@ -69,25 +64,25 @@ class Join
     /**
      * Set which columns to preform the ON operation on.
      *
-     * @param string $foreign_id Name of column in $_table to use for lookup.
-     * @param string|null $local_id Name of column to use in this table for lookup. If not provided, will use same value as $foreign_id.
+     * @param string $foreignId Name of column in $table to use for lookup.
+     * @param string|null $localId Name of column to use in this table for lookup. If not provided, will use same value as $foreign_id.
      */
-    public function on(string $foreign_id, ?string $local_id = null): void
+    public function on(string $foreignId, ?string $localId = null): void
     {
-        if (!isset($this->_table)) {
-            throw new JoinException('$_table must be set before running on() function.');
+        if (!isset($this->table)) {
+            throw new JoinException('$table must be set before running on() function.');
         }
 
-        $this->_foreign_id = $foreign_id;
-        $this->_local_id = $local_id ?? $foreign_id;
+        $this->foreignId = $foreignId;
+        $this->localId = $localId ?? $foreignId;
 
-        self::$joins_property->setAccessible(true);
+        self::$joinsProperty->setAccessible(true);
 
-        $joins_array = self::$joins_property->getValue($this->_query_instance);
+        $joins_array = self::$joinsProperty->getValue($this->queryInstance);
         $joins_array[] = $this->build();
 
-        self::$joins_property->setValue($this->_query_instance, $joins_array);
-        self::$joins_property->setAccessible(false);
+        self::$joinsProperty->setValue($this->queryInstance, $joins_array);
+        self::$joinsProperty->setAccessible(false);
     }
 
     /**
@@ -97,17 +92,27 @@ class Join
      */
     private function build(): string
     {
-        if (!isset($this->_through)) {
-            self::$table_property->setAccessible(true);
+        $through = isset($this->through)
+                        ? $this->through
+                        : $this->getQueryTableValue();
 
-            $through = self::$table_property->getValue($this->_query_instance);
+        return $this->keyword . ' JOIN ' . Util::escapeStrings($this->table) . ' ON ' . Util::escapeStrings($this->table) . '.' . Util::escapeStrings($this->foreignId) . ' = ' . Util::escapeStrings($through) . '.' . Util::escapeStrings($this->localId);
+    }
 
-            self::$table_property->setAccessible(false);
-        } else {
-            $through = $this->_through;
-        }
+    /**
+     * Get the value of $table in the child Query class.
+     * 
+     * @return string The $table value.
+     */
+    private function getQueryTableValue(): string
+    {
+        self::$tableProperty->setAccessible(true);
 
-        return $this->_keyword . ' JOIN ' . Util::escapeStrings($this->_table) . ' ON ' . Util::escapeStrings($this->_table) . '.' . Util::escapeStrings($this->_foreign_id) . ' = ' . Util::escapeStrings($through) . '.' . Util::escapeStrings($this->_local_id);
+        $table = self::$tableProperty->getValue($this->queryInstance);
+
+        self::$tableProperty->setAccessible(false);
+
+        return $table;
     }
 
     /**

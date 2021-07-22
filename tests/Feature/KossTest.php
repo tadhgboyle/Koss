@@ -6,8 +6,11 @@ use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * @uses Aberdeener\Koss\Util\Util
+ * @uses Aberdeener\Koss\Queries\Query
  * @uses Aberdeener\Koss\Queries\SelectQuery
+ * @uses Aberdeener\Koss\Queries\InsertQuery
  * @uses Aberdeener\Koss\Queries\UpdateQuery
+ * @uses Aberdeener\Koss\Queries\Traits\HasDuplicateKeys
  *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Exceptions\StatementException

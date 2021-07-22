@@ -13,44 +13,30 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 
 class SelectQuery extends Query
 {
-    protected PDO $_pdo;
-    protected PDOStatement $_query;
-    protected array $_result;
+    protected PDOStatement $query;
+    protected array $result;
 
-    protected string $_table;
-    protected string $_query_select = '';
-    protected string $_query_from = '';
-    protected string $_query_group_by = '';
-    protected string $_query_order_by = '';
-    protected string $_query_limit = '';
-    protected string $_query_built = '';
-    protected array $_joins = [];
-    protected array $_selected_columns = [];
-    protected array $_casts = [];
+    protected string $querySelect = '';
+    protected string $queryFrom = '';
+    protected string $queryGroupBy = '';
+    protected string $queryOrderBy = '';
+    protected string $queryLimit = '';
+    protected string $queryBuilt = '';
+    protected array $joins = [];
+    protected array $selectedColumns = [];
+    protected array $casts = [];
 
     /**
      * Create a new instance of SelectQuery.
      *
      * @param PDO $pdo Instance of PDO to use for actual querying.
-     * @param array $columns Array of column names to use in SELECT clause, used for detecting duplicates from compiled statement.
-     * @param string $query_select Valid MySQL statement to use for start of SELECT clause.
-     * @param string|null $query_from If provided, this will be the base for the FROM clause. Generated and provided automatically by Koss in the `getAll()` or `getSome()` functions.
      * @param string $table Name of table to use for primary SELECT statement. This is used to pass into Join objects if needed.
      */
-    public function __construct(PDO $pdo, array $columns, string $query_select, ?string $query_from = null, ?string $table = null)
-    {
-        $this->_pdo = $pdo;
-        $this->_selected_columns = $columns;
-        $this->_query_select = $query_select;
-
-        if ($query_from != null) {
-            $this->_query_from = $query_from;
-        }
-
-        if ($table != null) {
-            $this->_table = $table;
-        }
-    }
+    public function __construct(
+        protected PDO $pdo,
+        protected ?string $table = null,
+        protected ?string $rawQuery = null,
+    ) {}
 
     /**
      * Add columns to SELECT clause.
@@ -61,21 +47,38 @@ class SelectQuery extends Query
      */
     public function columns(array $columns): SelectQuery
     {
+        $first = $this->handleFirst();
+
         $new_columns = [];
 
         foreach ($columns as $column) {
-            if (!in_array($column, $this->_selected_columns)) {
+            if ($column == '*') {
+                // TODO
+            }
+
+            if (!in_array($column, $this->selectedColumns)) {
                 $new_columns[] = $column;
+                $this->selectedColumns[] = $column;
             }
         }
-        
-        if (!str_ends_with($this->_query_select, ',')) {
-            $this->_query_select .= ', ';
+
+        if (count($new_columns) && !$first && !str_ends_with($this->querySelect, ', ')) {
+            $this->querySelect .= ', ';
         }
 
-        $this->_query_select .= implode(', ', Util::escapeStrings($new_columns));
+        $this->querySelect .= implode(', ', Util::escapeStrings($new_columns));
 
         return $this;
+    }
+
+    private function handleFirst(): bool
+    {
+        if ($first = empty($this->querySelect)) {
+            $this->querySelect = 'SELECT ';
+            $this->queryFrom = 'FROM ' . Util::escapeStrings($this->table);
+        }
+
+        return $first;
     }
 
     /**
@@ -107,7 +110,7 @@ class SelectQuery extends Query
     /**
      * Preform a LEFT OUTER JOIN on this select statement.
      *
-     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept a `LeftOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
@@ -121,7 +124,7 @@ class SelectQuery extends Query
     /**
      * Preform a RIGHT OUTER JOIN on this select statement.
      *
-     * @param Closure $callback Function to call to handle the join statement creation. Must accept an `LeftOuterJoin` param.
+     * @param Closure $callback Function to call to handle the join statement creation. Must accept a `RightOuterJoin` param.
      *
      * @return SelectQuery This instance of SelectQuery.
      */
@@ -141,7 +144,8 @@ class SelectQuery extends Query
      */
     public function groupBy(string $column): SelectQuery
     {
-        $this->_query_group_by = "GROUP BY `$column`";
+        $column = Util::escapeStrings($column);
+        $this->queryGroupBy = "GROUP BY {$column}";
 
         return $this;
     }
@@ -156,7 +160,8 @@ class SelectQuery extends Query
      */
     public function orderBy(string $column, string $order = 'DESC'): SelectQuery
     {
-        $this->_query_order_by = "ORDER BY `$column` $order";
+        $column = Util::escapeStrings($column);
+        $this->queryOrderBy = "ORDER BY {$column} $order";
 
         return $this;
     }
@@ -170,7 +175,7 @@ class SelectQuery extends Query
      */
     public function limit(int $limit): SelectQuery
     {
-        $this->_query_limit = "LIMIT $limit";
+        $this->queryLimit = "LIMIT {$limit}";
 
         return $this;
     }
@@ -200,7 +205,7 @@ class SelectQuery extends Query
     public function casts(array $casts): SelectQuery
     {
         foreach ($casts as $column => $type) {
-            $this->_casts[$column] = $type;
+            $this->casts[$column] = $type;
         }
 
         return $this;
@@ -208,22 +213,22 @@ class SelectQuery extends Query
 
     public function execute(): array
     {
-        if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+        if (!($this->query = $this->pdo->prepare($this->build()))) {
             // @codeCoverageIgnoreStart
             return null;
             // @codeCoverageIgnoreEnd
         }
 
-        if (!$this->_query->execute()) {
+        if (!$this->query->execute()) {
             // @codeCoverageIgnoreStart
-            die(print_r($this->_pdo->errorInfo()));
+            die(print_r($this->pdo->errorInfo()));
             // @codeCoverageIgnoreEnd
         }
 
         $this->fetch();
         $this->reset();
 
-        return $this->_result;
+        return $this->result;
     }
 
     /**
@@ -232,19 +237,19 @@ class SelectQuery extends Query
     private function fetch(): void
     {
         try {
-            $this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+            $this->result = $this->query->fetchAll(PDO::FETCH_OBJ);
             // @codeCoverageIgnoreStart
         } catch (PDOException $e) {
             die($e->getMessage());
         }
         // @codeCoverageIgnoreEnd
 
-        if (count($this->_casts) < 1) {
+        if (count($this->casts) < 1) {
             return;
         }
 
-        foreach ($this->_casts as $column => $type) {
-            foreach ($this->_result as $row) {
+        foreach ($this->casts as $column => $type) {
+            foreach ($this->result as $row) {
                 if (!isset($row->{$column})) {
                     continue;
                 }
@@ -256,22 +261,26 @@ class SelectQuery extends Query
 
     public function build(): string
     {
-        $this->_query_built = trim(preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $this->_query_select . ' ' . $this->_query_from . ' ' . Util::assembleJoinClause($this->_joins) . ' ' . Util::assembleWhereClause($this->_where) . ' ' . $this->_query_group_by . ' ' . $this->_query_order_by . ' ' . $this->_query_limit));
+        $this->queryBuilt = $this->cleanString(
+            is_null($this->rawQuery)
+                ? $this->querySelect . ' ' . $this->queryFrom . ' ' . Util::assembleJoinClause($this->joins) . ' ' . Util::assembleWhereClause($this->whereClauses) . ' ' . $this->queryGroupBy . ' ' . $this->queryOrderBy . ' ' . $this->queryLimit
+                : $this->rawQuery
+        );
 
-        return $this->_query_built;
+        return $this->queryBuilt;
     }
 
     public function reset(): void
     {
-        $this->_query_select = '';
-        $this->_query_from = '';
-        $this->_query_group_by = '';
-        $this->_query_order_by = '';
-        $this->_query_limit = '';
-        $this->_query_built = '';
+        $this->querySelect = '';
+        $this->queryFrom = '';
+        $this->queryGroupBy = '';
+        $this->queryOrderBy = '';
+        $this->queryLimit = '';
+        $this->queryBuilt = '';
 
-        $this->_where = [];
-        $this->_selected_columns = [];
-        $this->_casts = [];
+        $this->whereClauses = [];
+        $this->selectedColumns = [];
+        $this->casts = [];
     }
 }

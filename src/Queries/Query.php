@@ -7,7 +7,7 @@ use Aberdeener\Koss\Util\Util;
 
 abstract class Query
 {
-    protected array $_where = [];
+    protected array $whereClauses = [];
 
     /**
      * Preform an AND WHERE operation in this query.
@@ -18,12 +18,12 @@ abstract class Query
      *
      * @return static This instance of Query.
      */
-    public function where(string $column, string $operator, ?string $matches = null): static
+    final public function where(string $column, string $operator, ?string $matches = null): static
     {
         $append = Util::handleWhereOperation($column, $operator, $matches);
 
         if (!is_null($append)) {
-            $this->_where[] = $append;
+            $this->whereClauses[] = $append;
         }
 
         return $this;
@@ -38,12 +38,12 @@ abstract class Query
      *
      * @return static This instance of Query.
      */
-    public function orWhere(string $column, string $operator, ?string $matches = null): static
+    final public function orWhere(string $column, string $operator, ?string $matches = null): static
     {
         $append = Util::handleWhereOperation($column, $operator, $matches, 'OR');
 
         if (!is_null($append)) {
-            $this->_where[] = $append;
+            $this->whereClauses[] = $append;
         }
 
         return $this;
@@ -58,7 +58,7 @@ abstract class Query
      *
      * @return static This instance of Query.
      */
-    public function like(string $column, string $like): static
+    final public function like(string $column, string $like): static
     {
         return $this->where($column, 'LIKE', $like);
     }
@@ -72,7 +72,7 @@ abstract class Query
      *
      * @return static This instance of Query.
      */
-    public function orLike(string $column, string $like): static
+    final public function orLike(string $column, string $like): static
     {
         return $this->orWhere($column, 'LIKE', $like);
     }
@@ -86,7 +86,7 @@ abstract class Query
      *
      * @return static This instance of Query.
      */
-    public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): static
+    final public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): static
     {
         if (is_callable($expression) ? $expression() : $expression) {
             $callback($this);
@@ -108,6 +108,23 @@ abstract class Query
      * Assemble clauses into matching MySQL statement.
      */
     abstract public function build(): string;
+
+    /**
+     * Safely remove all double spaces from a string.
+     * Used for sanitizing the query string before submitting it to the MySQL server.
+     * 
+     * @param string $string String to clean.
+     * 
+     * @return string String with all multiple whitespaces removed.
+     */
+    final protected function cleanString(string $string): string
+    {
+        return preg_replace(
+            '/^\s+|\s+$|\s+(?=\s)/',
+            '',
+            $string
+        );
+    }
 
     /**
      * Reset query strings and arrays.

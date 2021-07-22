@@ -25,11 +25,11 @@ class Util
         }
 
         if (!in_array($operator, ['=', '<>', 'LIKE'])) {
-            throw new StatementException("Invalid WHERE clause operator. Operator: $operator.");
+            throw new StatementException("Invalid WHERE clause operator. Operator: {$operator}.");
         }
 
         if (!in_array($glue, ['AND', 'OR'])) {
-            throw new StatementException("Invalid WHERE clause glue. Glue: $glue.");
+            throw new StatementException("Invalid WHERE clause glue. Glue: {$glue}.");
         }
 
         return [
@@ -52,7 +52,7 @@ class Util
         $clause = '';
 
         foreach ($joins as $join) {
-            $clause .= $join . ' ';
+            $clause .= "{$join} ";
         }
 
         return trim($clause);
@@ -78,7 +78,7 @@ class Util
                 $return .= $clause['glue'] . ' ';
             }
 
-            $return .= "`{$clause['column']}` {$clause['operator']} '{$clause['matches']}' ";
+            $return .= self::escapeStrings($clause['column']) . ' ' . $clause['operator'] . ' ' . self::escapeStrings($clause['matches'], "'") . ' ';
         }
 
         return trim($return);
@@ -103,7 +103,7 @@ class Util
     }
 
     /**
-     * Surround $string by $key.
+     * Surround $string by $key if it is not an asterisk character.
      * 
      * @param string $key Character to wrap $string in.
      * @param string $string String to wrap.
@@ -112,6 +112,10 @@ class Util
      */
     private static function wrapString(string $key, string $string): string
     {
+        if ($string == '*') {
+            return $string;
+        }
+
         return $key . $string . $key;
     }
 }

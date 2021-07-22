@@ -67,6 +67,14 @@ class SelectQueryTest extends TestCase
         );
     }
 
+    public function testGetSingleColumnThenSameAgain()
+    {
+        $this->assertEquals(
+            'SELECT `username` FROM `users`',
+            $this->koss->getSome('users', 'username')->column('username')->build()
+        );
+    }
+
     public function testGetSingleColumnThenMore()
     {
         $this->assertEquals(

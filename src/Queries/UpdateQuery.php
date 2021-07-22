@@ -2,83 +2,101 @@
 
 namespace Aberdeener\Koss\Queries;
 
+use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
 use PDO;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 
 class UpdateQuery extends Query
 {
-    protected PDO $_pdo;
-    protected PDOStatement $_query;
-    protected int $_result;
 
-    protected string $_query_insert = '';
-    protected string $_query_where = '';
-    protected string $_query_duplicate_key = '';
-    protected string $_query_built = '';
+    use HasDuplicateKeys;
+
+    protected PDOStatement $query;
+    protected int $result;
+
+    protected string $queryUpdate = '';
+    protected string $queryDuplicateKey = '';
+    protected string $queryBuilt = '';
+
+    protected array $values = [];
 
     /**
      * Create new instance of UpdateQuery. Should only be used internally by Koss.
      *
      * @param PDO $pdo PDO connection to be used.
-     * @param string $query Query string to start with.
      */
-    public function __construct(PDO $pdo, string $query)
+    public function __construct(
+        protected PDO $pdo,
+        protected ?string $table = null,
+        protected ?string $rawQuery = null,
+    ) {}
+
+    public function update(array $values): UpdateQuery
     {
-        $this->_pdo = $pdo;
-        $this->_query_insert = $query;
-    }
-
-    /**
-     * Key/Value array of column/value to insert if a duplicate key is found during this update query.
-     *
-     * @param array $values Key => Value array of row to update if duplicate key is found.
-     *
-     * @return UpdateQuery This instance of UpdateQuery.
-     */
-    public function onDuplicateKey(array $values): UpdateQuery
-    {
-        $compiled_values = '';
-
-        foreach ($values as $column => $value) {
-            $compiled_values .= "`$column` = '$value' ";
-        }
-
-        $this->_query_duplicate_key = "ON DUPLICATE KEY UPDATE $compiled_values";
+        $this->handleFirst();
+        $this->values[] = $values;
 
         return $this;
     }
 
+    private function handleFirst(): bool
+    {
+        if ($first = empty($this->queryUpdate)) {
+            $table = Util::escapeStrings($this->table);
+            $this->queryUpdate = "UPDATE {$table} SET ";
+        }
+
+        return $first;
+    }
+
     public function execute(): int
     {
-        if (!($this->_query = $this->_pdo->prepare($this->build()))) {
+        if (!($this->query = $this->pdo->prepare($this->build()))) {
             // @codeCoverageIgnoreStart
             return -1;
             // @codeCoverageIgnoreEnd
         }
 
-        if (!$this->_query->execute()) {
+        if (!$this->query->execute()) {
             // @codeCoverageIgnoreStart
-            die(print_r($this->_pdo->errorInfo()));
+            die(print_r($this->pdo->errorInfo()));
             // @codeCoverageIgnoreEnd
         }
 
-        $this->_result = $this->_query->rowCount();
+        $this->result = $this->query->rowCount();
         $this->reset();
 
-        return $this->_result;
+        return $this->result;
     }
 
     public function build(): string
     {
-        $this->_query_built = trim(preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $this->_query_insert . ' ' . $this->_query_duplicate_key . ' ' . Util::assembleWhereClause($this->_where)));
+        $this->queryBuilt = $this->cleanString(
+            is_null($this->rawQuery)
+                ? $this->queryUpdate . ' ' . $this->compileValues() . ' ' . $this->queryDuplicateKey . ' ' . Util::assembleWhereClause($this->whereClauses)
+                : $this->rawQuery
+        );
 
-        return $this->_query_built;
+        return $this->queryBuilt;
+    }
+
+    private function compileValues(): string
+    {
+        $values_compiled = '';
+
+        foreach ($this->values as $values) {
+            foreach ($values as $column => $value) {
+                $values_compiled .= Util::escapeStrings($column) . ' = ' . Util::escapeStrings($value, "'") . ', ';
+            }
+        }
+
+        return rtrim($values_compiled, ', ');
     }
 
     public function reset(): void
     {
-        $this->_where = [];
-        $this->_query_built = $this->_query_insert = $this->_query_duplicate_key = '';
+        $this->whereClauses = [];
+        $this->queryBuilt = $this->query_insert = $this->queryDuplicateKey = '';
     }
 }

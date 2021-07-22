@@ -1,11 +1,11 @@
 ![Koss Header Image](https://i.imgur.com/4FN4HlE.png)
 
 ## Roadmap
-  - "Bootstrap" SelectQuery and UpdateQuery instances (remove janky string insertions and use functions instead)
   - Make chained join clauses more fluent, after `on()` add a `then($callback)` (instead of current behaviour of multiple seperate calls and usage of `through($table)`) ?
+  - Use `__destruct()` (similar to its use in Laravel Queue) on Join classes instead of adding Join to Query in the `on()` function.
   - Allow `where()` to take arrays and nested arrays
+  - Add "dynamic" function support for where clauses and columns. Example: `whereEmail($email)` -> `WHERE email = '$email'`.
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
-  - Depending how advanced UpdateQuery gets, make InsertQuery to help seperate the internal code
 
 ## Documentation
 

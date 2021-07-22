@@ -3,7 +3,7 @@
 namespace Aberdeener\Koss;
 
 use PDO;
-use Aberdeener\Koss\Util\Util;
+use Aberdeener\Koss\Queries\InsertQuery;
 use Aberdeener\Koss\Queries\Query;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Queries\UpdateQuery;
@@ -18,12 +18,10 @@ use Aberdeener\Koss\Exceptions\StatementException;
  */
 class Koss
 {
-    protected PDO $_pdo;
-    protected PDOStatement $_query;
+    protected PDO $pdo;
+    protected PDOStatement $query;
 
-    protected Query $_query_instance;
-
-    protected array $_where = [];
+    protected Query $queryInstance;
 
     /**
      * Create new Koss instance.
@@ -36,7 +34,7 @@ class Koss
      */
     public function __construct(string $host, int $port, string $database, string $username, string $password)
     {
-        $this->_pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, [
+        $this->pdo = new PDO("mysql:host={$host};port={$port};dbname={$database}", $username, $password, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_TIMEOUT => 5,
         ]);
@@ -68,31 +66,27 @@ class Koss
             $columns = (array) $columns;
         }
 
-        $csv_columns = implode(', ', in_array('*', $columns) ? ['*'] : Util::escapeStrings($columns));
+        $this->queryInstance = (new SelectQuery($this->pdo, $table))->columns($columns);
 
-        $this->_query_instance = new SelectQuery($this->_pdo, $columns, "SELECT $csv_columns", "FROM `$table`", $table);
-
-        return $this->_query_instance;
+        return $this->queryInstance;
     }
 
     /**
      * Insert new row into a table.
-     * Sets this instance's $_query_instance to new UpdateQuery class.
-     * Forwards to UpdateQuery to handle.
+     * Sets this instance's $queryInstance to new InsertQuery class.
+     * Forwards to InsertQuery to handle.
      *
      * @param string $table Table to update.
      * @param array $row Column name/Value pairs to insert into table.
      *
-     * @return UpdateQuery New instance of UpdateQuery class.
+     * @return InsertQuery New instance of InsertQuery class.
      */
-    public function insert(string $table, array $row): UpdateQuery
+    public function insert(string $table, array $row): InsertQuery
     {
-        $columns = implode(', ', Util::escapeStrings(array_keys($row)));
-        $values = implode(', ', Util::escapeStrings(array_values($row), "'"));
+        $this->queryInstance = (new InsertQuery($this->pdo, $table))->insert(array_keys($row), array_values($row));
+        //$this->queryInstance = new UpdateQuery($this->pdo, $table, "INSERT INTO `$table` ($columns) VALUES ($values)");
 
-        $this->_query_instance = new UpdateQuery($this->_pdo, "INSERT INTO `$table` ($columns) VALUES ($values)");
-
-        return $this->_query_instance;
+        return $this->queryInstance;
     }
 
     /**
@@ -105,17 +99,9 @@ class Koss
      */
     public function update(string $table, array $values): UpdateQuery
     {
-        $values_compiled = '';
+        $this->queryInstance = (new UpdateQuery($this->pdo, $table))->update($values);
 
-        foreach ($values as $column => $value) {
-            $values_compiled .= "`$column` = '$value', ";
-        }
-
-        $values_compiled = rtrim($values_compiled, ', ');
-
-        $this->_query_instance = new UpdateQuery($this->_pdo, "UPDATE `$table` SET $values_compiled");
-
-        return $this->_query_instance;
+        return $this->queryInstance;
     }
 
     /**
@@ -131,14 +117,16 @@ class Koss
 
         switch ($token) {
             case 'SELECT':
-                return (new SelectQuery($this->_pdo, [], $query))->execute();
+                return (new SelectQuery($this->pdo, rawQuery: $query))->execute();
 
             case 'INSERT':
+                return (new InsertQuery($this->pdo, rawQuery: $query))->execute();
+
             case 'UPDATE':
-                return (new UpdateQuery($this->_pdo, $query))->execute();
+                return (new UpdateQuery($this->pdo, rawQuery: $query))->execute();
 
             default:
-                throw new StatementException("Unsupported start of MySQL query string. Token: $token.");
+                throw new StatementException("Unsupported start of MySQL query string. Token: {$token}.");
         }
     }
 }

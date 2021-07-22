@@ -11,7 +11,8 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
 /**
  * @uses Aberdeener\Koss\Koss
  * @uses Aberdeener\Koss\Util\Util
- *
+ * @uses Aberdeener\Koss\Queries\Query
+ * 
  * @covers Aberdeener\Koss\Queries\Joins\Join
  * @covers Aberdeener\Koss\Exceptions\JoinException
  * @covers Aberdeener\Koss\Queries\Joins\InnerJoin
