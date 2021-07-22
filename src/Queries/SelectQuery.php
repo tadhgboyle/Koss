@@ -62,8 +62,13 @@ class SelectQuery extends Query
             }
         }
 
+<<<<<<< HEAD
         if (count($new_columns) && !$first && !str_ends_with($this->querySelect, ', ')) {
             $this->querySelect .= ', ';
+=======
+        if (!str_ends_with($this->_query_select, ',')) {
+            $this->_query_select .= ', ';
+>>>>>>> d0067a1dd94e20f143a4bbf7b105659e6b5b91e9
         }
 
         $this->querySelect .= implode(', ', Util::escapeStrings($new_columns));
