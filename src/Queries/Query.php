@@ -41,9 +41,9 @@ abstract class Query
     /**
      * Safely remove all double spaces from a string.
      * Used for sanitizing the query string before submitting it to the MySQL server.
-     * 
+     *
      * @param string $string String to clean.
-     * 
+     *
      * @return string String with all multiple whitespaces removed.
      */
     final protected function cleanString(string $string): string

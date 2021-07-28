@@ -3,8 +3,8 @@
 namespace Aberdeener\Koss;
 
 use PDO;
-use Aberdeener\Koss\Queries\InsertQuery;
 use Aberdeener\Koss\Queries\Query;
+use Aberdeener\Koss\Queries\InsertQuery;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Queries\UpdateQuery;
 use Aberdeener\Koss\Exceptions\StatementException;

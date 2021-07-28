@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Traits\HasDuplicateKeys
- * 
+ *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\UpdateQuery

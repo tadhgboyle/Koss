@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Query
  * @uses Aberdeener\Koss\Queries\InsertQuery
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Traits\HasDuplicateKeys
  */
 class DuplicateKeysTest extends TestCase
