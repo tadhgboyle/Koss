@@ -4,7 +4,7 @@ namespace Aberdeener\Koss\Util;
 
 use Aberdeener\Koss\Exceptions\StatementException;
 
-class Util
+final class Util
 {
     /**
      * Create an array of `column`, `operator` and `matches` for WHERE clauses.
@@ -19,7 +19,7 @@ class Util
      */
     public static function handleWhereOperation(string $column, string $operator, ?string $matches = null, ?string $glue = 'AND'): array
     {
-        if ($matches == null) {
+        if ($matches === null) {
             $matches = $operator;
             $operator = '=';
         }
@@ -49,13 +49,7 @@ class Util
      */
     public static function assembleJoinClause(array $joins): string
     {
-        $clause = '';
-
-        foreach ($joins as $join) {
-            $clause .= "{$join} ";
-        }
-
-        return trim($clause);
+        return implode(' ', $joins);
     }
 
     /**
@@ -99,7 +93,7 @@ class Util
             return self::wrapString($key, $strings);
         }
 
-        return array_map(fn ($string) => self::wrapString($key, $string), $strings);
+        return array_map(static fn ($string) => self::wrapString($key, $string), $strings);
     }
 
     /**
@@ -112,7 +106,7 @@ class Util
      */
     private static function wrapString(string $key, string $string): string
     {
-        if ($string == '*') {
+        if ($string === '*') {
             return $string;
         }
 

@@ -12,6 +12,7 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
  * @uses Aberdeener\Koss\Koss
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Query
+ * @uses Aberdeener\Koss\Queries\Traits\DynamicWhereCalls
  * 
  * @covers Aberdeener\Koss\Queries\Joins\Join
  * @covers Aberdeener\Koss\Exceptions\JoinException
@@ -33,7 +34,7 @@ class JoinTest extends TestCase
     {
         $this->expectException(JoinException::class);
 
-        new Join('NULL', $this->koss->getAll('users'));
+        new LeftInnerJoin($this->koss->getAll('users'));
     }
 
     public function testInnerJoin()
@@ -46,7 +47,7 @@ class JoinTest extends TestCase
         );
     }
 
-    public function testInnerJoinCannotUseOnBeforeTableSet()
+    public function testInnerJoinCannotProceedBeforeTableSet()
     {
         $this->expectException(JoinException::class);
 
@@ -84,5 +85,13 @@ class JoinTest extends TestCase
                 $join->table('users_groups')->on('users_id');
             })->build()
         );
+    }
+}
+
+class LeftInnerJoin extends Join
+{
+    public function __construct($queryInstance)
+    {
+        parent::__construct('LEFT INNNER', $queryInstance);
     }
 }

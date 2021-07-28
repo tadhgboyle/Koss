@@ -3,19 +3,18 @@
 namespace Aberdeener\Koss\Queries;
 
 use PDO;
-use Aberdeener\Koss\Util\Util;
-use Aberdeener\Koss\Queries\Query;
-use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
 use PDOStatement;
+use Aberdeener\Koss\Util\Util;
+use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
 
-class InsertQuery extends Query
+final class InsertQuery extends Query
 {
     use HasDuplicateKeys;
 
     protected PDOStatement $query;
     protected int $result;
 
-    protected string $insertQuery = '';
+    protected string $insertQuery;
     protected array $insertData = [];
     protected string $insertDuplicateKey = '';
 
@@ -42,7 +41,7 @@ class InsertQuery extends Query
 
     private function handleFirst(): bool
     {
-        if ($first = empty($this->insertQuery)) {
+        if ($first = !isset($this->insertQuery)) {
             $this->insertQuery = "INSERT INTO `{$this->table}`";
         }
 
@@ -72,9 +71,8 @@ class InsertQuery extends Query
     public function build(): string
     {
         return $this->cleanString(
-            isset($this->rawQuery)
-                ? $this->rawQuery
-                : $this->insertQuery . $this->compileValues() . $this->duplicateKey
+            $this->rawQuery
+                ?? $this->insertQuery . $this->compileValues() . $this->duplicateKey
         );
     }
 

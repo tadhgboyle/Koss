@@ -3,22 +3,24 @@
 namespace Aberdeener\Koss\Queries;
 
 use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
+use Aberdeener\Koss\Queries\Traits\HasWhereClauses;
 use PDO;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
 
-class UpdateQuery extends Query
+final class UpdateQuery extends Query
 {
-
     use HasDuplicateKeys;
+    use HasWhereClauses;
 
-    protected PDOStatement $query;
+    protected PDOStatement $pdoStatement;
     protected int $result;
 
-    protected string $queryUpdate = '';
+    protected string $queryUpdate;
     protected string $queryDuplicateKey = '';
     protected string $queryBuilt = '';
 
+    /** @var array[] */
     protected array $values = [];
 
     /**
@@ -42,7 +44,7 @@ class UpdateQuery extends Query
 
     private function handleFirst(): bool
     {
-        if ($first = empty($this->queryUpdate)) {
+        if ($first = !isset($this->queryUpdate)) {
             $table = Util::escapeStrings($this->table);
             $this->queryUpdate = "UPDATE {$table} SET ";
         }
@@ -52,19 +54,19 @@ class UpdateQuery extends Query
 
     public function execute(): int
     {
-        if (!($this->query = $this->pdo->prepare($this->build()))) {
+        if (!($this->pdoStatement = $this->pdo->prepare($this->build()))) {
             // @codeCoverageIgnoreStart
             return -1;
             // @codeCoverageIgnoreEnd
         }
 
-        if (!$this->query->execute()) {
+        if (!$this->pdoStatement->execute()) {
             // @codeCoverageIgnoreStart
             die(print_r($this->pdo->errorInfo()));
             // @codeCoverageIgnoreEnd
         }
 
-        $this->result = $this->query->rowCount();
+        $this->result = $this->pdoStatement->rowCount();
         $this->reset();
 
         return $this->result;
@@ -73,9 +75,8 @@ class UpdateQuery extends Query
     public function build(): string
     {
         $this->queryBuilt = $this->cleanString(
-            is_null($this->rawQuery)
-                ? $this->queryUpdate . ' ' . $this->compileValues() . ' ' . $this->queryDuplicateKey . ' ' . Util::assembleWhereClause($this->whereClauses)
-                : $this->rawQuery
+            $this->rawQuery
+                ?? $this->queryUpdate . ' ' . $this->compileValues() . ' ' . $this->queryDuplicateKey . ' ' . Util::assembleWhereClause($this->whereClauses)
         );
 
         return $this->queryBuilt;

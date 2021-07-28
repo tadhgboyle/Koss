@@ -10,20 +10,26 @@ use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
 use Aberdeener\Koss\Queries\Joins\LeftOuterJoin;
 use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
+use Aberdeener\Koss\Queries\Traits\HasWhereClauses;
 
-class SelectQuery extends Query
+final class SelectQuery extends Query
 {
-    protected PDOStatement $query;
+    use HasWhereClauses;
+
+    protected PDOStatement $pdoStatement;
     protected array $result;
 
-    protected string $querySelect = '';
+    protected string $querySelect;
     protected string $queryFrom = '';
     protected string $queryGroupBy = '';
     protected string $queryOrderBy = '';
     protected string $queryLimit = '';
     protected string $queryBuilt = '';
+    /** @var string[] */
     protected array $joins = [];
+    /** @var string[] */
     protected array $selectedColumns = [];
+    /** @var string[] */
     protected array $casts = [];
 
     /**
@@ -39,6 +45,18 @@ class SelectQuery extends Query
     ) {}
 
     /**
+     * Add a single column to the SELECT clause.
+     *
+     * @param string $column Name of column.
+     *
+     * @return SelectQuery This instance of SelectQuery.
+     */
+    public function column(string $column): SelectQuery
+    {
+        return $this->columns([$column]);
+    }
+
+    /**
      * Add columns to SELECT clause.
      *
      * @param array $columns Names of columns to select.
@@ -52,9 +70,9 @@ class SelectQuery extends Query
         $new_columns = [];
 
         foreach ($columns as $column) {
-            if ($column == '*') {
-                // TODO
-            }
+            // if ($column === '*') {
+            //     // TODO
+            // }
 
             if (!in_array($column, $this->selectedColumns)) {
                 $new_columns[] = $column;
@@ -73,24 +91,12 @@ class SelectQuery extends Query
 
     private function handleFirst(): bool
     {
-        if ($first = empty($this->querySelect)) {
+        if ($first = !isset($this->querySelect)) {
             $this->querySelect = 'SELECT ';
             $this->queryFrom = 'FROM ' . Util::escapeStrings($this->table);
         }
 
         return $first;
-    }
-
-    /**
-     * Add a single column to the SELECT clause.
-     *
-     * @param string $column Name of column.
-     *
-     * @return SelectQuery This instance of SelectQuery.
-     */
-    public function column(string $column): SelectQuery
-    {
-        return $this->columns([$column]);
     }
 
     /**
@@ -161,7 +167,7 @@ class SelectQuery extends Query
     public function orderBy(string $column, string $order = 'DESC'): SelectQuery
     {
         $column = Util::escapeStrings($column);
-        $this->queryOrderBy = "ORDER BY {$column} $order";
+        $this->queryOrderBy = "ORDER BY {$column} {$order}";
 
         return $this;
     }
@@ -211,15 +217,18 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * @return array Results
+     */
     public function execute(): array
     {
-        if (!($this->query = $this->pdo->prepare($this->build()))) {
+        if (!($this->pdoStatement = $this->pdo->prepare($this->build()))) {
             // @codeCoverageIgnoreStart
             return null;
             // @codeCoverageIgnoreEnd
         }
 
-        if (!$this->query->execute()) {
+        if (!$this->pdoStatement->execute()) {
             // @codeCoverageIgnoreStart
             die(print_r($this->pdo->errorInfo()));
             // @codeCoverageIgnoreEnd
@@ -237,7 +246,7 @@ class SelectQuery extends Query
     private function fetch(): void
     {
         try {
-            $this->result = $this->query->fetchAll(PDO::FETCH_OBJ);
+            $this->result = $this->pdoStatement->fetchAll(PDO::FETCH_OBJ);
             // @codeCoverageIgnoreStart
         } catch (PDOException $e) {
             die($e->getMessage());

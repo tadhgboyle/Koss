@@ -16,12 +16,10 @@ use Aberdeener\Koss\Exceptions\StatementException;
  *
  * @since October 2020
  */
-class Koss
+final class Koss
 {
-    protected PDO $pdo;
-    protected PDOStatement $query;
-
-    protected Query $queryInstance;
+    private PDO $pdo;
+    private Query $queryInstance;
 
     /**
      * Create new Koss instance.
@@ -84,7 +82,6 @@ class Koss
     public function insert(string $table, array $row): InsertQuery
     {
         $this->queryInstance = (new InsertQuery($this->pdo, $table))->insert(array_keys($row), array_values($row));
-        //$this->queryInstance = new UpdateQuery($this->pdo, $table, "INSERT INTO `$table` ($columns) VALUES ($values)");
 
         return $this->queryInstance;
     }

@@ -4,7 +4,7 @@ namespace Aberdeener\Koss\Exceptions;
 
 use Exception;
 
-final class StatementException extends Exception
+final class DynamicWhereCallException extends Exception
 {
     public function __construct(string $message)
     {

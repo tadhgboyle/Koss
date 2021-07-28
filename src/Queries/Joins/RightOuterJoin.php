@@ -4,7 +4,7 @@ namespace Aberdeener\Koss\Queries\Joins;
 
 use Aberdeener\Koss\Queries\SelectQuery;
 
-class RightOuterJoin extends Join
+final class RightOuterJoin extends Join
 {
     public function __construct(SelectQuery $query)
     {

@@ -8,7 +8,7 @@ use Aberdeener\Koss\Util\Util;
 use Aberdeener\Koss\Queries\SelectQuery;
 use Aberdeener\Koss\Exceptions\JoinException;
 
-class Join
+abstract class Join
 {
     protected string $table;
     protected string $through;
@@ -24,7 +24,7 @@ class Join
         protected SelectQuery $queryInstance
     ) {
         if (!in_array($keyword, ['INNER', 'OUTER', 'LEFT OUTER', 'RIGHT OUTER'])) {
-            throw new JoinException("Invalid JOIN clause keyword. Keyword: $keyword");
+            throw new JoinException("Invalid JOIN clause keyword. Keyword: {$keyword}");
         }
 
         self::$selectQueryClass = new ReflectionClass(SelectQuery::class);
@@ -69,13 +69,14 @@ class Join
      */
     public function on(string $foreignId, ?string $localId = null): void
     {
-        if (!isset($this->table)) {
-            throw new JoinException('$table must be set before running on() function.');
-        }
-
         $this->foreignId = $foreignId;
         $this->localId = $localId ?? $foreignId;
 
+        $this->saveJoinClause();
+    }
+
+    private function saveJoinClause(): void
+    {
         self::$joinsProperty->setAccessible(true);
 
         $joins_array = self::$joinsProperty->getValue($this->queryInstance);
@@ -92,9 +93,12 @@ class Join
      */
     private function build(): string
     {
-        $through = isset($this->through)
-                        ? $this->through
-                        : $this->getQueryTableValue();
+        if (!isset($this->table)) {
+            throw new JoinException('$table must be set before using `on()`.');
+        }
+
+        $through = $this->through
+                        ?? $this->getQueryTableValue();
 
         return $this->keyword . ' JOIN ' . Util::escapeStrings($this->table) . ' ON ' . Util::escapeStrings($this->table) . '.' . Util::escapeStrings($this->foreignId) . ' = ' . Util::escapeStrings($through) . '.' . Util::escapeStrings($this->localId);
     }
