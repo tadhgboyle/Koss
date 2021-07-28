@@ -98,7 +98,7 @@ final class Util
 
     /**
      * Surround $string by $key if it is not an asterisk character.
-     * 
+     *
      * @param string $key Character to wrap $string in.
      * @param string $string String to wrap.
      *

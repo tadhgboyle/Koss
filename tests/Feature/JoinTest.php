@@ -13,7 +13,7 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Query
  * @uses Aberdeener\Koss\Queries\Traits\DynamicWhereCalls
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Joins\Join
  * @covers Aberdeener\Koss\Exceptions\JoinException
  * @covers Aberdeener\Koss\Queries\Joins\InnerJoin

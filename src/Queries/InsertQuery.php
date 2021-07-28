@@ -22,7 +22,8 @@ final class InsertQuery extends Query
         protected PDO $pdo,
         protected ?string $table = null,
         protected ?string $rawQuery = null,
-    ) {}
+    ) {
+    }
 
     public function insert(array $columns, array $values): InsertQuery
     {

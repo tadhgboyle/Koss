@@ -2,11 +2,11 @@
 
 namespace Aberdeener\Koss\Queries;
 
-use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
-use Aberdeener\Koss\Queries\Traits\HasWhereClauses;
 use PDO;
 use PDOStatement;
 use Aberdeener\Koss\Util\Util;
+use Aberdeener\Koss\Queries\Traits\HasWhereClauses;
+use Aberdeener\Koss\Queries\Traits\HasDuplicateKeys;
 
 final class UpdateQuery extends Query
 {
@@ -32,7 +32,8 @@ final class UpdateQuery extends Query
         protected PDO $pdo,
         protected ?string $table = null,
         protected ?string $rawQuery = null,
-    ) {}
+    ) {
+    }
 
     public function update(array $values): UpdateQuery
     {

@@ -105,7 +105,7 @@ abstract class Join
 
     /**
      * Get the value of $table in the child Query class.
-     * 
+     *
      * @return string The $table value.
      */
     private function getQueryTableValue(): string

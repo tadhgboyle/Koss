@@ -42,7 +42,8 @@ final class SelectQuery extends Query
         protected PDO $pdo,
         protected ?string $table = null,
         protected ?string $rawQuery = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Add a single column to the SELECT clause.

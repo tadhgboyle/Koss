@@ -7,7 +7,7 @@ use Aberdeener\Koss\Queries\SelectQuery;
 /**
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Traits\DynamicWhereCalls
- * 
+ *
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\SelectQuery
