@@ -7,7 +7,7 @@ use Aberdeener\Koss\Exceptions\StatementException;
  * @uses Aberdeener\Koss\Queries\Query
  * @uses Aberdeener\Koss\Queries\SelectQuery
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Traits\HasWhereClauses
  * @covers Aberdeener\Koss\Exceptions\StatementException
  */
@@ -34,7 +34,7 @@ class WhereClausesTest extends KossTestCase
         $this->assertEquals(
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener' AND `full_name` <> 'Ronan Boyle'",
             $this->koss->getAll('users')->where([['username', 'Aberdeener'], ['full_name', '<>', 'Ronan Boyle']])->build()
-        ); 
+        );
     }
 
     public function testUsesGlueIfProvided()
@@ -42,7 +42,7 @@ class WhereClausesTest extends KossTestCase
         $this->assertEquals(
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener' OR `full_name` = 'Tadhg Boyle'",
             $this->koss->getAll('users')->where([['username', 'Aberdeener'], ['full_name', 'Tadhg Boyle', 'OR']])->build()
-        ); 
+        );
     }
 
     public function testCanDetermineGlueIfNotProvided()
@@ -50,7 +50,7 @@ class WhereClausesTest extends KossTestCase
         $this->assertEquals(
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener' OR `full_name` = 'Tadhg Boyle'",
             $this->koss->getAll('users')->where('username', 'Aberdeener')->orWhere('full_name', 'Tadhg Boyle')->build()
-        ); 
+        );
     }
 
     public function testIgnoresIndividualValuesInNestedArrayWhereClause()
@@ -58,7 +58,7 @@ class WhereClausesTest extends KossTestCase
         $this->assertEquals(
             "SELECT * FROM `users` WHERE `username` = 'Aberdeener'",
             $this->koss->getAll('users')->where([['username', 'Aberdeener'], 'ignore'])->build()
-        ); 
+        );
     }
 
     public function testNeedsAtLeastTwoElementsInEachNestedArray()

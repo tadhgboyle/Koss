@@ -2,8 +2,6 @@
 
 namespace Aberdeener\Koss\Util;
 
-use Aberdeener\Koss\Exceptions\StatementException;
-
 final class Util
 {
     /**
