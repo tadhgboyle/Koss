@@ -1,9 +1,5 @@
 <?php
 
-use Aberdeener\Koss\Koss;
-use PHPUnit\Framework\TestCase;
-use Aberdeener\Koss\Queries\SelectQuery;
-
 /**
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Traits\DynamicWhereCalls
@@ -12,15 +8,8 @@ use Aberdeener\Koss\Queries\SelectQuery;
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\SelectQuery
  */
-class SelectQueryTest extends TestCase
+class SelectQueryTest extends KossTestCase
 {
-    private Koss $koss;
-
-    public function setUp(): void
-    {
-        $this->koss = new Koss('localhost', 3306, 'koss', 'root', '');
-    }
-
     public function testGetAllColumns()
     {
         $this->assertEquals(
@@ -113,32 +102,6 @@ class SelectQueryTest extends TestCase
         $this->assertEquals(
             'SELECT * FROM `users` LIMIT 5',
             $this->koss->getAll('users')->limit(5)->build()
-        );
-    }
-
-    public function testWhenWithTrueAndNoFallback()
-    {
-        $this->assertEquals(
-            'SELECT * FROM `users` LIMIT 5',
-            $this->koss->getAll('users')->when(fn () => true, fn (SelectQuery $query) => $query->limit(5))->build()
-        );
-    }
-
-    public function testWhenWithFalseAndNoFallback()
-    {
-        $this->assertEquals(
-            'SELECT * FROM `users`',
-            $this->koss->getAll('users')->when(fn () => false, fn (SelectQuery $query) => $query->limit(5))->build()
-        );
-    }
-
-    public function testWhenWithFalseAndWithFallback()
-    {
-        $this->assertEquals(
-            'SELECT * FROM `users` ORDER BY `full_name` DESC',
-            $this->koss->getAll('users')->when(fn () => false, fn () => null, function (SelectQuery $query) {
-                return $query->orderBy('full_name');
-            })->build()
         );
     }
 

@@ -1,8 +1,5 @@
 <?php
 
-use Aberdeener\Koss\Koss;
-use PHPUnit\Framework\TestCase;
-
 /**
  * @uses Aberdeener\Koss\Koss
  * @uses Aberdeener\Koss\Queries\SelectQuery
@@ -10,14 +7,8 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers Aberdeener\Koss\Queries\Query
  */
-class QueryTest extends TestCase
+class QueryTest extends KossTestCase
 {
-    private Koss $koss;
-
-    public function setUp(): void
-    {
-        $this->koss = new Koss('localhost', 3306, 'koss', 'root', '');
-    }
 
     public function testWhereNoOperator()
     {

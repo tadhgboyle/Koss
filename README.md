@@ -2,7 +2,6 @@
 
 ## Roadmap
   - Make chained join clauses more fluent, after `on()` add a `then($callback)` (instead of current behaviour of multiple seperate calls and usage of `through($table)`) ?
-  - Allow `where()` to take arrays and nested arrays
   - Add `prefix(string $prefix)` function to set a table prefix to automatically append.
 
 ## Documentation
@@ -26,9 +25,12 @@ Functions which are available in both Selection and Update/Insert queries.
   - `execute()`
     - Execute compiled Koss MySQL code and output results
     - *Note: Without calling this function at the end of your code, nothing will output!*`
-  - `when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null)`
-    - Only execute `$callback` function when `$expression` is true. If `$fallback` is provided, it will be called when `$expression` is false.
+  - `when(Closure | bool $expression, Closure $callback)`
+    - Only execute `$callback` function when `$expression` is true.
     - *Note: `$expression` can be either a boolean value (`5 < 10`) or an anonymous function which returns a boolean value*
+  - `unless(Closure | bool $expression, Closure $callback)`
+    - Only execute `$callback` function when `$expression` is false.
+    - *Note: `$expression` can be either a boolean value or an anonymous function which returns a boolean value*
   - `where(string $column, string $operator, string $matches)`
     - Select rows in `$table` (must be previously provided via a select statement) with values in `$column` that are `$operator` to `$match`
     - *Note: If `$operator` is not provided, `'='` will be assumed*

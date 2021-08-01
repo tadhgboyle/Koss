@@ -6,7 +6,6 @@ use Aberdeener\Koss\Exceptions\DynamicWhereCallException;
 
 trait DynamicWhereCalls
 {
-    // TODO: Tests
     public function __call(string $name, array $arguments): static
     {
         $column = $this->parseColumnName($name);
@@ -19,9 +18,13 @@ trait DynamicWhereCalls
             throw new DynamicWhereCallException('No string provided to match with.');
         }
 
+        if (count($arguments) > 1) {
+            throw new DynamicWhereCallException('Multiple arguments provided. Only pass one.');
+        }
+
         $matches = $arguments[0];
 
-        return $this->where($column, '=', $matches);
+        return $this->where([$column, '=', $matches]);
     }
 
     private function parseColumnName(string $string): string

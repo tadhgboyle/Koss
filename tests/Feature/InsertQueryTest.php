@@ -1,8 +1,5 @@
 <?php
 
-use Aberdeener\Koss\Koss;
-use PHPUnit\Framework\TestCase;
-
 /**
  * @uses Aberdeener\Koss\Util\Util
  *
@@ -10,15 +7,8 @@ use PHPUnit\Framework\TestCase;
  * @covers Aberdeener\Koss\Queries\Query
  * @covers Aberdeener\Koss\Queries\InsertQuery
  */
-class InsertQueryTest extends TestCase
+class InsertQueryTest extends KossTestCase
 {
-    private Koss $koss;
-
-    public function setUp(): void
-    {
-        $this->koss = new Koss('localhost', 3306, 'koss', 'root', '');
-    }
-
     public function testInsert()
     {
         $this->assertEquals(

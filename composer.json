@@ -17,6 +17,9 @@
     "autoload": {
         "psr-4": {
             "Aberdeener\\Koss\\": "src/"
-        }
+        },
+        "files": [
+            "tests/KossTestCase.php"
+        ]
     }
 }

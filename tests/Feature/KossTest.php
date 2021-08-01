@@ -1,7 +1,6 @@
 <?php
 
 use Aberdeener\Koss\Koss;
-use PHPUnit\Framework\TestCase;
 use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
@@ -15,7 +14,7 @@ use Aberdeener\Koss\Exceptions\StatementException;
  * @covers Aberdeener\Koss\Koss
  * @covers Aberdeener\Koss\Exceptions\StatementException
  */
-class KossTest extends TestCase
+class KossTest extends KossTestCase
 {
     public function testCanCreateKossInstance()
     {
@@ -26,32 +25,26 @@ class KossTest extends TestCase
 
     public function testRawExecuteSelection()
     {
-        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
-        $results = $koss->execute('SELECT * FROM `users`');
+        $results = $this->koss->execute('SELECT * FROM `users`');
 
         $this->assertIsArray($results);
     }
 
     public function testRawExecuteInserting()
     {
-        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
-
-        $this->assertEquals(1, $koss->execute("INSERT INTO users (username, full_name, balance) VALUES ('Aberdeener', 'Tadhg Boyle', 123.45)"));
+        $this->assertEquals(1, $this->koss->execute("INSERT INTO users (username, full_name, balance) VALUES ('Aberdeener', 'Tadhg Boyle', 123.45)"));
     }
 
     public function testRawExecuteUpdating()
     {
-        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
-
-        $this->assertIsInt($koss->execute("UPDATE users SET username = 'Aber' WHERE balance = 123.45"));
+        $this->assertIsInt($this->koss->execute("UPDATE users SET username = 'Aber' WHERE balance = 123.45"));
     }
 
     public function testExceptionOnInvalidRawQuery()
     {
         $this->expectException(StatementException::class);
 
-        $koss = new Koss('localhost', 3306, 'koss', 'root', '');
-        $koss->execute('NULL');
+        $this->koss->execute('NULL');
     }
 
     // TODO: PDO timeout of 5 seconds makes tests really annoying to run, alternate way?

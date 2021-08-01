@@ -2,31 +2,11 @@
 
 namespace Aberdeener\Koss\Queries;
 
-use Closure;
+use Aberdeener\Koss\Queries\Traits\Conditionable;
 
 abstract class Query
 {
-    /**
-     * Run a Koss function only when the specified $expression is true.
-     *
-     * @param Closure|bool $expression Function or boolean value to eval.
-     * @param Closure $callback Function to run when $expression is true.
-     * @param Closure|null $fallback Function to run when $expression is false.
-     *
-     * @return static This instance of Query.
-     */
-    final public function when(Closure | bool $expression, Closure $callback, ?Closure $fallback = null): static
-    {
-        if (is_callable($expression) ? $expression() : $expression) {
-            $callback($this);
-        } else {
-            if (is_callable($fallback)) {
-                $fallback($this);
-            }
-        }
-
-        return $this;
-    }
+    use Conditionable;
 
     /**
      * Execute repsective query and store result.

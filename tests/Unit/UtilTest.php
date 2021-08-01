@@ -2,7 +2,6 @@
 
 use Aberdeener\Koss\Util\Util;
 use PHPUnit\Framework\TestCase;
-use Aberdeener\Koss\Exceptions\StatementException;
 
 /**
  * @covers Aberdeener\Koss\Util\Util
@@ -10,56 +9,6 @@ use Aberdeener\Koss\Exceptions\StatementException;
  */
 class UtilTest extends TestCase
 {
-    public function testHandleWhereClauseFunctionNoOperator()
-    {
-        $where_array = Util::handleWhereOperation('username', 'Aberdeener');
-
-        $this->assertEquals([
-            'glue' => 'AND',
-            'column' => 'username',
-            'operator' => '=',
-            'matches' => 'Aberdeener',
-        ], $where_array);
-    }
-
-    public function testHandleWhereClauseFunctionWithExplicitOperator()
-    {
-        $where_array = Util::handleWhereOperation('username', '<>', 'Aberdeener');
-
-        $this->assertEquals([
-            'glue' => 'AND',
-            'column' => 'username',
-            'operator' => '<>',
-            'matches' => 'Aberdeener',
-        ], $where_array);
-    }
-
-    public function testHandleWhereClauseFunctionWithInvalidOperator()
-    {
-        $this->expectException(StatementException::class);
-
-        Util::handleWhereOperation('username', '!=', 'Aberdeener');
-    }
-
-    public function testHandleWhereClauseFunctionWithExplicitGlue()
-    {
-        $where_array = Util::handleWhereOperation('username', '=', 'Aberdeener', 'OR');
-
-        $this->assertEquals([
-            'glue' => 'OR',
-            'column' => 'username',
-            'operator' => '=',
-            'matches' => 'Aberdeener',
-        ], $where_array);
-    }
-
-    public function testHandleWhereClauseFunctionWithInvalidGlue()
-    {
-        $this->expectException(StatementException::class);
-
-        Util::handleWhereOperation('username', '=', 'Aberdeener', 'XOR');
-    }
-
     public function testAssembleJoinClauseFunction()
     {
         $join_string = Util::assembleJoinClause([

@@ -1,7 +1,5 @@
 <?php
 
-use Aberdeener\Koss\Koss;
-use PHPUnit\Framework\TestCase;
 use Aberdeener\Koss\Queries\Joins\Join;
 use Aberdeener\Koss\Queries\Joins\InnerJoin;
 use Aberdeener\Koss\Exceptions\JoinException;
@@ -21,15 +19,8 @@ use Aberdeener\Koss\Queries\Joins\RightOuterJoin;
  * @covers Aberdeener\Koss\Queries\Joins\RightOuterJoin
  * @covers Aberdeener\Koss\Queries\SelectQuery
  */
-class JoinTest extends TestCase
+class JoinTest extends KossTestCase
 {
-    private Koss $koss;
-
-    public function setUp(): void
-    {
-        $this->koss = new Koss('localhost', 3306, 'koss', 'root', '');
-    }
-
     public function testCannotMakeJoinSubclassWithInvalidKeyword()
     {
         $this->expectException(JoinException::class);

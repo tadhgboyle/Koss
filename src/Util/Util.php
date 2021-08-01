@@ -7,40 +7,6 @@ use Aberdeener\Koss\Exceptions\StatementException;
 final class Util
 {
     /**
-     * Create an array of `column`, `operator` and `matches` for WHERE clauses.
-     * Validates that $operator is valid.
-     *
-     * @param string $column Name of column to use in clause.
-     * @param string $operator Operator to use in comparison.
-     * @param string|null $matches Value to match with. If not provided, operator will be assumed as `=` and $operator will be used as match.
-     * @param string|null $glue How to join this clause with other WHERE clauses. Can be `AND` or `OR`.
-     *
-     * @return array Validated and prepared array.
-     */
-    public static function handleWhereOperation(string $column, string $operator, ?string $matches = null, ?string $glue = 'AND'): array
-    {
-        if ($matches === null) {
-            $matches = $operator;
-            $operator = '=';
-        }
-
-        if (!in_array($operator, ['=', '<>', 'LIKE'])) {
-            throw new StatementException("Invalid WHERE clause operator. Operator: {$operator}.");
-        }
-
-        if (!in_array($glue, ['AND', 'OR'])) {
-            throw new StatementException("Invalid WHERE clause glue. Glue: {$glue}.");
-        }
-
-        return [
-            'glue' => $glue,
-            'column' => $column,
-            'operator' => $operator,
-            'matches' => $matches,
-        ];
-    }
-
-    /**
      * Create string of joint JOIN clauses for use in final query.
      *
      * @param array $joins Raw JOIN statements
