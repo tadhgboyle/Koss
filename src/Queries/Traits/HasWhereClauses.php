@@ -20,7 +20,7 @@ trait HasWhereClauses
      *
      * @return static This instance of Query.
      */
-    final public function where(string|array $column, ?string $operator = null, ?string $matches = null): static
+    final public function where(string | array $column, ?string $operator = null, ?string $matches = null): static
     {
         $this->handleWhereOperation(func_get_args());
 
@@ -36,7 +36,7 @@ trait HasWhereClauses
      *
      * @return static This instance of Query.
      */
-    final public function orWhere(string|array $column, ?string $operator = null, ?string $matches = null): static
+    final public function orWhere(string | array $column, ?string $operator = null, ?string $matches = null): static
     {
         $this->handleWhereOperation(func_get_args());
 
@@ -155,7 +155,7 @@ trait HasWhereClauses
 
     /**
      * Create and store a where clause in an array from the given parameters.
-     * 
+     *
      * @param string $column Column name to use in clause.
      * @param string $operator Operator to use in clause to find matches.
      * @param string $matches Value to use to compare.
@@ -181,9 +181,9 @@ trait HasWhereClauses
 
     /**
      * Determine if provided array is multidimensional (contains more arrays), or not.
-     * 
+     *
      * @param array $array Array to check.
-     * 
+     *
      * @return bool Whether $array is multidim or not.
      */
     private function isMultiDimensionalArray(array $array): bool
@@ -193,9 +193,9 @@ trait HasWhereClauses
 
     /**
      * Determine if provided string is a valid MySQL comparision operator.
-     * 
+     *
      * @param string $operator String to check.
-     * 
+     *
      * @return bool If it is valid or not.
      */
     private function isValidOperator(string $operator): bool
@@ -205,7 +205,7 @@ trait HasWhereClauses
 
     /**
      * Loop debug backtrace to see what where clause function was called to assume the $glue to provide to `addWhereClause()`.
-     * 
+     *
      * @return string `"AND"` if `where()` or `like()` was called. `"OR"` if `orWhere()` or `orLike()` was called.
      */
     private function getGlueFromBacktrace(): string
@@ -213,9 +213,8 @@ trait HasWhereClauses
         $backtrace = debug_backtrace();
 
         foreach ($backtrace as $frame) {
-
             if (in_array($frame['function'], ['handleWhereOperation', 'getGlueFromBacktrace'])) {
-                continue; 
+                continue;
             }
 
             $function = $frame['function'];

@@ -8,7 +8,7 @@ use Aberdeener\Koss\Exceptions\DynamicWhereCallException;
  * @uses Aberdeener\Koss\Queries\SelectQuery
  * @uses Aberdeener\Koss\Queries\Traits\HasWhereClauses
  * @uses Aberdeener\Koss\Util\Util
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Traits\DynamicWhereCalls
  * @covers Aberdeener\Koss\Exceptions\DynamicWhereCallException
  */

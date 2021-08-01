@@ -7,7 +7,7 @@ use Aberdeener\Koss\Queries\SelectQuery;
  * @uses Aberdeener\Koss\Util\Util
  * @uses Aberdeener\Koss\Queries\Query
  * @uses Aberdeener\Koss\Queries\SelectQuery
- * 
+ *
  * @covers Aberdeener\Koss\Queries\Traits\Conditionable
  */
 class ConditionableTest extends KossTestCase
@@ -32,7 +32,7 @@ class ConditionableTest extends KossTestCase
     {
         $this->assertEquals(
             'SELECT * FROM `users` LIMIT 5',
-            $this->koss->getAll('users')->unless(fn() => false, fn (SelectQuery $query) => $query->limit(5))->build()
+            $this->koss->getAll('users')->unless(fn () => false, fn (SelectQuery $query) => $query->limit(5))->build()
         );
     }
 

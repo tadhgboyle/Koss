@@ -9,7 +9,6 @@
  */
 class QueryTest extends KossTestCase
 {
-
     public function testWhereNoOperator()
     {
         $this->assertEquals(
