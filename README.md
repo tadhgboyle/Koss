@@ -24,7 +24,7 @@
 Functions which are available in both Selection and Update/Insert queries.
   - `execute()`
     - Execute compiled Koss MySQL code and output results
-    - *Note: Without calling this function at the end of your code, nothing will output!*`
+    - *Note: Without calling this function at the end of your code, nothing will output!*
   - `when(Closure | bool $expression, Closure $callback)`
     - Only execute `$callback` function when `$expression` is true.
     - *Note: `$expression` can be either a boolean value (`5 < 10`) or an anonymous function which returns a boolean value*
