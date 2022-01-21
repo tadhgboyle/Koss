@@ -58,7 +58,7 @@ final class Koss
      *
      * @return SelectQuery New instance of SelectQuery class
      */
-    public function getSome(string $table, array | string $columns): SelectQuery
+    public function getSome(string $table, array|string $columns): SelectQuery
     {
         if (!is_array($columns)) {
             $columns = (array) $columns;
@@ -108,7 +108,7 @@ final class Koss
      *
      * @return array|int Array of select values, or int of number of rows changed - depending on statement type.
      */
-    public function execute(string $query): array | int
+    public function execute(string $query): array|int
     {
         $token = explode(' ', $query)[0];
 
