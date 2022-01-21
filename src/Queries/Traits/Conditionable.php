@@ -14,7 +14,7 @@ trait Conditionable
      *
      * @return static This instance of Query.
      */
-    final public function when(Closure | bool $expression, Closure $callback): static
+    final public function when(Closure|bool $expression, Closure $callback): static
     {
         if ($this->isTrue($expression)) {
             $callback($this);
@@ -31,7 +31,7 @@ trait Conditionable
      *
      * @return static This instance of Query.
      */
-    final public function unless(Closure | bool $expression, Closure $callback): static
+    final public function unless(Closure|bool $expression, Closure $callback): static
     {
         if ($this->isFalse($expression)) {
             $callback($this);
@@ -40,12 +40,12 @@ trait Conditionable
         return $this;
     }
 
-    private function isTrue(Closure | bool $expression): bool
+    private function isTrue(Closure|bool $expression): bool
     {
         return is_callable($expression) ? $expression() : $expression;
     }
 
-    private function isFalse(Closure | bool $expression): bool
+    private function isFalse(Closure|bool $expression): bool
     {
         return !$this->isTrue($expression);
     }

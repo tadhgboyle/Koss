@@ -51,7 +51,7 @@ final class Util
      *
      * @return array|string Escaped strings.
      */
-    public static function escapeStrings(array | string $strings, string $key = '`'): array | string
+    public static function escapeStrings(array|string $strings, string $key = '`'): array|string
     {
         if (!is_array($strings)) {
             return self::wrapString($key, $strings);

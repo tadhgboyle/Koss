@@ -20,7 +20,7 @@ trait HasWhereClauses
      *
      * @return static This instance of Query.
      */
-    final public function where(string | array $column, ?string $operator = null, ?string $matches = null): static
+    final public function where(string|array $column, ?string $operator = null, ?string $matches = null): static
     {
         $this->handleWhereOperation(func_get_args());
 
@@ -36,7 +36,7 @@ trait HasWhereClauses
      *
      * @return static This instance of Query.
      */
-    final public function orWhere(string | array $column, ?string $operator = null, ?string $matches = null): static
+    final public function orWhere(string|array $column, ?string $operator = null, ?string $matches = null): static
     {
         $this->handleWhereOperation(func_get_args());
 

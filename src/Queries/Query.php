@@ -11,7 +11,7 @@ abstract class Query
     /**
      * Execute repsective query and store result.
      */
-    abstract public function execute(): array | int;
+    abstract public function execute(): array|int;
 
     /**
      * Assemble clauses into matching MySQL statement.
